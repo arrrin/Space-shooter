@@ -4,7 +4,7 @@
 #include<math.h>
 #include<vector>
 #include"dArr.h"
-
+#include<fstream>
 
 using namespace sf;
 
@@ -20,13 +20,15 @@ private:
 	Vector2f direction;
 	float timerMax;
 	float timer;
-	bool follow;
+	bool accelerate;
+	
 
 
 public:
 	TextTag(Font* font, std::string text, Color color,
-		Vector2f position, unsigned int size,
-		float timerMax
+		Vector2f position, Vector2f(direction),
+		unsigned int size,float timerMax,
+		bool accelerate
 	);
 	virtual ~TextTag();
 

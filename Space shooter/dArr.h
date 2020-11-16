@@ -8,19 +8,19 @@ private:
 	unsigned nrOfEl;
 	T** arr;
 
-
 	void initialize(unsigned from);
 	void expand();
-
 public:
 	dArr(unsigned cap = 5);
+	dArr(const dArr& obj);
 	~dArr();
 
 	T& operator[](int index);
+	void operator = (const T& obj);
 
 	void add(const T element);
 	void remove(int index);
-	unsigned getSize()const;
+	unsigned size()const;
 	void clear();
 };
 
@@ -35,6 +35,21 @@ dArr<T>::dArr(unsigned cap)
 	this->initialize(0);
 }
 
+template<typename T>
+dArr<T>::dArr(const dArr& obj)
+{
+	this->cap = obj.cap;
+	this->nrOfEl = obj.nrOfEl;
+
+	this->arr = new T * [this->cap];
+
+	for (size_t i = 0; i < this->nrOfEl; i++)
+	{
+		this->arr[i] = new T(*obj.arr[i]);
+	}
+
+	this->initialize(this->nrOfEl);
+}
 
 template<typename T>
 dArr<T>::~dArr()
@@ -46,7 +61,6 @@ dArr<T>::~dArr()
 	delete[] this->arr;
 }
 
-
 template<typename T>
 T& dArr<T>::operator[](int index)
 {
@@ -56,16 +70,36 @@ T& dArr<T>::operator[](int index)
 	return *this->arr[index];
 }
 
+template<typename T>
+void dArr<T>::operator = (const T& obj)
+{
+	for (size_t i = 0; i < this->nrOfEl; i++)
+	{
+		delete this->arr[i];
+	}
+	delete[] this->arr;
+
+	this->cap = obj.cap;
+	this->nrOfEl = obj.nrOfEl;
+
+	this->arr = new T * [this->cap];
+
+	for (size_t i = 0; i < this->nrOfEl; i++)
+	{
+		this->arr[i] = new T(*obj.arr[i]);
+	}
+
+	this->initialize(this->nrOfEl);
+}
 
 template<typename T>
 void dArr<T>::initialize(unsigned from)
 {
-	for (size_t i = 0; i < this->cap; i++)
+	for (size_t i = from; i < this->cap; i++)
 	{
 		this->arr[i] = nullptr;
 	}
 }
-
 
 template<typename T>
 void dArr<T>::expand()
@@ -89,10 +123,10 @@ void dArr<T>::expand()
 template<typename T>
 void dArr<T>::add(const T element)
 {
-	if (this->nrofEl >= this->cap)
+	if (this->nrOfEl >= this->cap)
 		this->expand();
 
-	this->arr[this->nrofEl++] = new T(element);
+	this->arr[this->nrOfEl++] = new T(element);
 }
 
 template<typename T>
@@ -109,9 +143,9 @@ void dArr<T>::remove(int index)
 }
 
 template<typename T>
-unsigned dArr<T>::getSize()const
+unsigned dArr<T>::size()const
 {
-	return this->nrofEl;
+	return this->nrOfEl;
 }
 
 template<typename T>

@@ -11,10 +11,6 @@ int main()
 
 	Game game(&window);
 
-
-	dArr<int> ints;
-
-
 	// Game loop
 	while (window.isOpen())
 	{
@@ -33,5 +29,4 @@ int main()
 		game.Draw();
 	
 	}
-
 }

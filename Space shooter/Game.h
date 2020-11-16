@@ -20,20 +20,27 @@ private:
 	RectangleShape playerExpBar; //bar
 
 	//tags
-	std::vector<TextTag> textTags;
+	dArr<TextTag> textTags;
 
 	//Player
-	std::vector<Player> players;
+	dArr<Player> players;
 	int playersAlive;
 
 	//Enemies
-	std::vector<Enemy> enemies;
+	dArr<Enemy> enemies;
 	std::vector<Enemy> enemiesSaved;
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 
 	//texture
 	std::vector<Texture> textures;
+	dArr<Texture> enemyTextures;
+
+	dArr<Texture> lWingTextures;
+	dArr<Texture> rWingTextures;
+	dArr<Texture> cPitTextures;
+	dArr<Texture> auraTextures;
+
 
 public:
 	Game(RenderWindow* window);
@@ -43,6 +50,7 @@ public:
 
 
 	//function
+	void initTextures();
 	void initUI();
 	void UpdateUIPlayer(int index);
 	void UpdateUIEnemy(int index);
