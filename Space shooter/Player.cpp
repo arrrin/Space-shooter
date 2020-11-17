@@ -69,9 +69,9 @@ Player::Player(std::vector<Texture>& textures,
 
 
 	//select accessory
-	this->lWingSelect = 0;
-	this->rWingSelect = 0;
-	this->cPitSelect = 0;
+	this->lWingSelect = 1;
+	this->rWingSelect = 1;
+	this->cPitSelect = 1;
 	this->auraSelect = 0;
 
 	//acessory texture
@@ -139,8 +139,12 @@ Player::Player(std::vector<Texture>& textures,
 
 	//upgrade
 	this->mainGunLevel = 0;
+	this->piercingShot = false;
+	this->shield = false;
 	this->dualMissiles01 = false;
 	this->dualMissiles02 = false;
+
+	this->setGunlevel(0);
 
 	// Co op
 	this->playerNr = Player::players;
@@ -203,6 +207,21 @@ void Player::takeDamage(int damage)
 	this->hp -= damage;
 
 	this->damageTimer = 0;
+
+	this->currentVelo.x += -(this->normDir.x) * 10.f;
+	this->currentVelo.y += -(this->normDir.y) * 10.f;
+}
+
+void Player::gainHP(int hp)
+{
+	this->hp += hp;
+	if (this->hp > this->hpMax)
+		this->hp = this->hpMax;
+}
+
+void Player::setGunlevel(int gunLevel)
+{
+	this->mainGunLevel = gunLevel;
 }
 
 bool Player::UpdateLeveling()
@@ -220,9 +239,9 @@ bool Player::UpdateLeveling()
 		this->power++;
 		this->plating++;
 
-		this->hpMax = 10.f+plating*2.f;
-		this->damageMax = 2 + power*2;
-		this->damage = 1 + power;
+		this->hpMax += plating * 5.f;
+		this->damageMax +=  power*2;
+		this->damage +=  power;
 
 
 		this->hp = hpMax;
@@ -279,13 +298,13 @@ void Player::changeAccessories()
 
 }
 
-void Player::UpdateAccessories(const float &dt)
+void Player::UpdateAccessories(const float& dt)
 {
 	// set position gun to follow player
-	this->mainGunSprite.setPosition(
-		this->mainGunSprite.getPosition().x ,
-		this->playerCenter.y);
-
+		this->mainGunSprite.setPosition(
+			this->mainGunSprite.getPosition().x,
+			this->playerCenter.y);
+	
 	//main gun animate after firing
 	if (this->mainGunSprite.getPosition().x < this->playerCenter.x + 20)
 	{
@@ -318,8 +337,13 @@ void Player::UpdateAccessories(const float &dt)
 
 }
 
-void Player::Movement(const float& dt)
+void Player::Movement(Vector2u windowBound, const float& dt)
 {
+	//update normal dir
+
+	this->normDir = normalize(this->currentVelo, vectorLength(this->currentVelo));
+
+
 	//up
 	if (Keyboard::isKeyPressed(Keyboard::Key(this->controls[controls::up])))
 	{
@@ -404,6 +428,32 @@ void Player::Movement(const float& dt)
 	this->playerCenter.y = this->sprite.getPosition().y +
 		this->sprite.getGlobalBounds().height / 2;
 
+	//window collision
+	
+	if (this->getPosition().x <= 0)
+	{
+		this->sprite.setPosition(0.f, this->sprite.getPosition().y);
+		this->currentVelo.x = 0.f;
+	}
+
+	else if (this->getPosition().y <= 0)
+	{
+		this->sprite.setPosition(this->sprite.getPosition().x, 0.f);
+		this->currentVelo.y = 0.f;
+	}
+
+	else if (this->getPosition().x + this->getGlobalBounds().width>= windowBound.x)
+	{
+		this->sprite.setPosition(windowBound.x - this->getGlobalBounds().width, this->sprite.getPosition().y );
+		this->currentVelo.x = 0.f;
+	}
+	else if (this->getPosition().y  + this->getGlobalBounds().height >= windowBound.y)
+	{
+		this->sprite.setPosition(this->sprite.getPosition().x , windowBound.y - this->getGlobalBounds().height);
+		this->currentVelo.y = 0.f;
+	}
+
+		
 }
 
 void Player::Combat(const float& dt)
@@ -417,23 +467,44 @@ void Player::Combat(const float& dt)
 			if (this->mainGunLevel == 0) {
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y),
-					Vector2f(0.3f, .13f),
+					Vector2f(0.4f, .10f),
 					70.f, 2.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 			}
-			else if (this->mainGunLevel == 1) {
+			//double ray
+			else if (this->mainGunLevel == 1) 
+			{
 				this->bullets.add(Bullet(laserTexture,
-					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y),
-					Vector2f(0.2f, .2f),
+					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y-25),
+					Vector2f(0.4f, .10f),
+					70.f, 20.f,
+					Vector2f(1.f, 0.f),
+					5.f));
+				this->bullets.add(Bullet(laserTexture,
+					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y+25),
+					Vector2f(0.4f, .10f),
 					70.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 			}
-			else if (this->mainGunLevel == 2) {
+			else if (this->mainGunLevel == 2) 
+				{
 				this->bullets.add(Bullet(laserTexture,
-					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y),
-					Vector2f(0.2f, .2f),
+					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y - 40),
+					Vector2f(0.4f, .10f),
+					70.f, 20.f,
+					Vector2f(1.f, 0.f),
+					5.f));
+				this->bullets.add(Bullet(laserTexture,
+					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y  ),
+					Vector2f(0.4f, .10f),
+					70.f, 20.f,
+					Vector2f(1.f, 0.f),
+					5.f));
+				this->bullets.add(Bullet(laserTexture,
+					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y +40),
+					Vector2f(0.4f, .10f),
 					70.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
@@ -463,15 +534,8 @@ void Player::Combat(const float& dt)
 					1.f));
 			}
 		}
-		else if (this->currentWeapons == MISSILE02)
-		{
-			if (this->dualMissiles02)
-			{
-
-			}
-		}
 		
-	
+		
 		this->shootTimer = 0; // reset timer
 	}
 	
@@ -510,7 +574,7 @@ void Player::Update(Vector2u windowBounds, const float& dt)
 	if (this->keyTime < this->keyTimeMax)
 		this->keyTime += 1.f * dt * this->dtMultipiler;
 
-	this->Movement(dt);
+	this->Movement(windowBounds, dt);
 	this->changeAccessories();
 	this->UpdateAccessories(dt);
 	this->Combat(dt);

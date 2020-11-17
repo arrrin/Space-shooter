@@ -46,7 +46,8 @@ private:
 	float acceleration;
 	Vector2f direction;
 	float stabilizerForce;
-
+	Vector2f normDir;
+	
 	int level;
 	int exp;
 	int expNext;
@@ -69,8 +70,11 @@ private:
 
 	//Upgrades
 	int mainGunLevel;
+	bool piercingShot;
+	bool shield;
 	bool dualMissiles01;
 	bool dualMissiles02;
+
 
 public:
 	Player(std::vector<Texture> &textures,
@@ -103,17 +107,43 @@ public:
 	inline void gainScore(int score) { this->score += score; }
 	inline const int getScore()const { return this->score; }
 	inline bool isDamagedCooldown() { return this->damageTimer <this->damageTimerMax; }
+	void gainHP(int hp);
+	void setGunlevel(int gunLevel);
+	inline void enablePiercingShot(){ this->piercingShot = true; }
+	inline void enableDualMissile01() { this->dualMissiles01 = true; }
+	inline void enableDualMissile02() { this->dualMissiles02 = true; }
+	inline void enableShield() { this->shield = true; }
+	inline void upgradeHP() { 
+		int temp = rand() % 7;
+		this->hpMax += temp; 
+		this->hp += temp;
+				}
+	inline bool getPiercingShot()const { return this->piercingShot; }
+	inline const int& getGunLevel()const { return this->mainGunLevel; }
 
 	//function
 	bool UpdateLeveling();
 	void changeAccessories();
 	void UpdateAccessories(const float& dt);
-	void Movement(const float& dt);
+	void Movement(Vector2u windowBound,const float& dt);
 	void Combat(const float& dt);
 	void Update(Vector2u windowBounds, const float& dt);
 	void Draw(RenderTarget& target);
 
 	//static
 	static unsigned players;
+
+	//normal func
+	float vectorLength(Vector2f v)
+	{
+		return sqrt(pow(v.x, 2) + pow(v.y, 2));
+	}
+	Vector2f normalize(Vector2f v, float length)
+	{
+		if (length == 0)
+			return Vector2f(0.f,0.f);
+		else
+			return v / length;
+	}
 };
 

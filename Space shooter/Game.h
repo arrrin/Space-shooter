@@ -5,8 +5,15 @@
 class Game
 {
 private:
+
 	RenderWindow *window;
 	float dtMultiplier;
+	unsigned score;
+	unsigned scoreMultiplier;
+	float multiplierTimerMax;
+	float multiplierTimer;
+	int multiplierAdder;
+	int multiplierAdderMax;
 
 	//Text
 	Font font;
@@ -14,6 +21,7 @@ private:
 	Text staticPlayerText;
 	Text enemyText;
 	Text gameOverText;
+	Text scoreText;
 	
 	//UI
 
@@ -32,14 +40,24 @@ private:
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 
+	//pickups
+	dArr<Pickup> pickups;
+	
+	//upgrades
+	dArr<Upgrade> upgrades;
+
 	//texture
 	std::vector<Texture> textures;
 	dArr<Texture> enemyTextures;
+	dArr<Texture> enemyBulletTextures;
 
 	dArr<Texture> lWingTextures;
 	dArr<Texture> rWingTextures;
 	dArr<Texture> cPitTextures;
 	dArr<Texture> auraTextures;
+	
+	dArr<Texture> pickupTextures;
+	dArr<Texture> upgradeTextures;
 
 
 public:

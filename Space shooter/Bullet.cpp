@@ -18,11 +18,14 @@ Bullet::Bullet(Texture *texture,Vector2f position,
 
 
 
+	this->sprite.setOrigin(
+		this->sprite.getGlobalBounds().width / 2,
+		this->sprite.getGlobalBounds().height / 2
+	);
+
 	this->sprite.setScale(scale);
-	this->sprite.setPosition(
-		Vector2f(
-			position.x - this->sprite.getGlobalBounds().width/2,
-			position.y- this->sprite.getGlobalBounds().height / 2));
+	this->sprite.setPosition(position);
+	this->sprite.setRotation(atan2(this->direction.y, this->direction.x) * 180 /3.1415926 +180);
 }
 
 Bullet::~Bullet()

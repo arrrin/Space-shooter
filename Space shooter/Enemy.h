@@ -4,15 +4,26 @@
 class Enemy
 {
 private:
+
+	float dtMultipiler;
+
 	dArr<Texture>* textures;
 	Sprite sprite;
 	Vector2u windowBounds;
-	Vector2f direction;
+	Vector2f moveDirection;
+	Vector2f normalizedMoveDir;
+	Vector2f lookDirection;
+	Vector2f normalizedLookDir;
+	float maxVelocity;
 
-	float dtMultipiler ;
-	
+	dArr<Texture>* bulletTextures;
+	dArr<Bullet> bullets;
+
 	float damagetimerMax;
 	float damageTimer;
+
+	float shootTimerMax;
+	float shootTimer;
 
 	int type;
 	int hp;
@@ -23,11 +34,14 @@ private:
 	int playerFollow;
 
 public:
-	Enemy(dArr<Texture>&textures,Vector2u windowBounds,
+	Enemy(
+		dArr<Texture>&textures,
+		dArr<Texture>& bulletTextures,
+		Vector2u windowBounds,
 		Vector2f position, 
-		Vector2f direction,Vector2f scale,
-		int type,int hpMax, 
-		int damageMax, int damageMin,
+		Vector2f direction
+		,int type,
+		int scalar,
 		int playerFollow);
 	virtual ~Enemy();
 
@@ -38,9 +52,10 @@ public:
 	inline  FloatRect getGlobalBounds()const { return this->sprite.getGlobalBounds(); }
 	inline  Vector2f getPosition()const { return this->sprite.getPosition(); }
 	inline const int& getPlayerFollow()const { return this-> playerFollow; }
-
+	inline dArr<Bullet>& getBullets() { return this->bullets; }
 
 	//function
+	void collision();
 	void takeDamage(int damage);
 	void Update(const float& dt,Vector2f playerPosition);
 	void draw(RenderTarget &target);
@@ -52,7 +67,10 @@ public:
 	}
 	Vector2f normalize(Vector2f v, float length)
 	{
-		return v / length;
+		if (length == 0)
+			return Vector2f(0.f, 0.f);
+		else
+			return v / length;
 	}
 };
 

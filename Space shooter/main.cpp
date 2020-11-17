@@ -4,7 +4,7 @@ int main()
 {
 	srand(time(NULL));
 
-	RenderWindow window(VideoMode(1600, 900), "Wingman", Style::Default);
+	RenderWindow window(VideoMode(1920, 1080), "Wing-man", Style::Default);
 	
 	Clock clock;
 	float dt = 0.f;

@@ -1,12 +1,7 @@
 #pragma once
-#include<SFML/Graphics.hpp>
-#include<iostream>
-#include<math.h>
-#include<vector>
-#include"dArr.h"
-#include<fstream>
+#include"Pickup.h"
 
-using namespace sf;
+
 
 class TextTag
 {

@@ -7,6 +7,13 @@ Game::Game(RenderWindow *window)
 	this->window = window;
 	this->window->setFramerateLimit(120);
 	this->dtMultiplier = 60;
+	this->scoreMultiplier = 1;
+	this->score = 0;
+	this->multiplierAdderMax = 10;
+	this->multiplierAdder = 0;
+	this->multiplierTimerMax =200.f;
+	this->multiplierTimer = this->multiplierTimerMax;
+
 	
 	//init font
 	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
@@ -21,7 +28,7 @@ Game::Game(RenderWindow *window)
 
 	this->playersAlive = this->players.size();	
 
-	this->enemySpawnTimerMax = 30;
+	this->enemySpawnTimerMax = 25;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
 
 
@@ -51,6 +58,34 @@ void Game::initTextures()
 	this->enemyTextures.add(Texture(temp));
 	temp.loadFromFile("Textures/enemyFollow.png");
 	this->enemyTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/enemyMoveLeftShoot.png");
+	this->enemyTextures.add(Texture(temp));
+
+
+	//pickup
+	temp.loadFromFile("Textures/Pickups/hpSupply.png");
+	this->pickupTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Pickups/missileSupply.png");
+	this->pickupTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Pickups/missileHSupply.png");
+	this->pickupTextures.add(Texture(temp));
+
+	//upgrade
+	temp.loadFromFile("Textures/Upgrades/doubleray.png");
+	this->upgradeTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Upgrades/tripleray.png");
+	this->upgradeTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Upgrades/piercingshot.png");
+	this->upgradeTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Upgrades/shield.png");
+	this->upgradeTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Upgrades/healthtank.png");
+	this->upgradeTextures.add(Texture(temp));
+
+
+	//enemy bullet
+	temp.loadFromFile("Textures/Guns/roundBulletRed.png");
+	this->enemyBulletTextures.add(Texture(temp));
 
 	//init texture folders accesory
 	std::ifstream in;
@@ -141,6 +176,13 @@ void Game::initUI()
 	this->gameOverText.setString("GAME OVER!!");
 	this->gameOverText.setPosition( 100.f,this->window->getSize().y /2);
 
+	this->scoreText.setFont(this->font);
+	this->scoreText.setFillColor(Color(200,200,200,150));
+	this->scoreText.setCharacterSize(30);
+	this->scoreText.setString("Score : 0");
+	this->scoreText.setPosition(10.f,10.f);
+
+
 }
 
 void Game::UpdateUIPlayer(int index)
@@ -183,7 +225,8 @@ void Game::UpdateUIEnemy(int index)
 {
 	this->enemyText.setPosition(
 		this->enemies[index].getPosition().x,
-		this->enemies[index].getPosition().y- 13.f);
+		this->enemies[index].getPosition().y- 
+		this->enemies[index].getGlobalBounds().height);
 
 	this->enemyText.setString(
 		std::to_string(
@@ -193,23 +236,46 @@ void Game::UpdateUIEnemy(int index)
 
 }
 
-void Game::Update(const float &dt)
+void Game::Update(const float& dt)
 {
-	if (this->playersAlive >0) 
+	if (this->playersAlive > 0)
 	{
 		//updateTimer
 		if (this->enemySpawnTimer < this->enemySpawnTimerMax)
-			this->enemySpawnTimer+= 1.f* dt * this->dtMultiplier;
+			this->enemySpawnTimer += 1.f * dt * this->dtMultiplier;
+
+		//score timer multiply
+		if (this->multiplierTimer > 0.f)
+		{
+			this->multiplierTimer -= 1.f * dt * this->dtMultiplier;
+
+			if (this->multiplierTimer <= 0.f)
+			{
+				this->multiplierTimer = 0.f;
+				this->multiplierAdder = 0;
+				this->scoreMultiplier = 1;
+			}
+		}
+		if (this->multiplierAdder >= this->multiplierAdderMax)
+		{
+			this->multiplierAdder = 0;
+			this->scoreMultiplier++;
+		}
+		//upgrade
 
 		//Spawn enemies
 		if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
 		{
 			this->enemies.add(Enemy(
-				this->enemyTextures, this->window->getSize(),
-				Vector2f(0.f, 0.f)
-				, Vector2f(-1.f, 0.f), Vector2f(0.1f, 0.1f),
-				rand()%2, rand() % 3 + 1, 2, 1 ,rand()%this->playersAlive
-			));
+				this->enemyTextures,
+				this->enemyBulletTextures,
+				this->window->getSize(),
+				Vector2f(0.f, 0.f),
+				Vector2f(-1.f, 0.f),
+				rand() % 3,
+				this->players[0].getLevel(),
+				rand() % this->playersAlive)
+			);
 
 			this->enemySpawnTimer = 0;
 		}
@@ -220,7 +286,7 @@ void Game::Update(const float &dt)
 			if (this->players[i].isAlive())
 			{
 				//Update player
-				this->players[i].Update(this->window->getSize(),dt);
+				this->players[i].Update(this->window->getSize(), dt);
 
 
 
@@ -235,7 +301,10 @@ void Game::Update(const float &dt)
 
 						if (this->players[i].getBullets(k).getGlobalBounds().intersects(this->enemies[j].getGlobalBounds()))
 						{
-							this->players[i].removeBullet(k);
+
+							//piercing
+							if(!this->players[i].getPiercingShot())
+								this->players[i].removeBullet(k);
 							//take dmg
 							int damage = this->players[i].getDamage();
 							if (this->enemies[j].getHP() > 0)
@@ -245,26 +314,68 @@ void Game::Update(const float &dt)
 								//text when shoot
 								this->textTags.add(
 									TextTag(
-										&this->font,"-" + std::to_string(damage),
+										&this->font, "-" + std::to_string(damage),
 										Color::Red,
 										Vector2f(this->enemies[j].getPosition().x + 20.f,
 											this->enemies[j].getPosition().y - 20.f),
-										Vector2f(1.f,0.f),
+										Vector2f(1.f, 0.f),
 										26, 17.f,
 										true)
 								);
 							}
 
-							//dead
+							//enemy dead
 							if (this->enemies[j].getHP() <= 0)
 							{
 								//exp gain
 								int exp = this->enemies[j].getHPMax() +
-									(rand() % this->enemies[j].getHPMax() + 1);
+									(rand() % this->enemies[j].getHPMax() + 1 *
+										this->scoreMultiplier);
 
-								//score 
-								int score = this->enemies[j].getHPMax();
+								//score & reset timer
+								this->multiplierTimer = this->multiplierTimerMax;
+								int score = this->enemies[j].getHPMax() * this->scoreMultiplier;
+								this->multiplierAdder++;
 								this->players[i].gainScore(score);
+
+								//score text tag
+								this->textTags.add(
+									TextTag(
+										&this->font,
+										" + " + std::to_string(score) + "	( x"
+										+ std::to_string(this->scoreMultiplier) + " )",
+										Color::Yellow,
+										Vector2f(100.f, 10.f),
+										Vector2f(1.f, 0.f),
+										30,
+										40.f, true)
+								);
+
+								int dropChange = rand() & 100 + 1;
+		
+									if (dropChange < 10) 
+									{
+										this->pickups.add(Pickup(
+											this->pickupTextures,
+											this->enemies[j].getPosition(),
+											0,
+											150.f)
+										);
+									}
+									else
+									{
+										dropChange = rand() % 100 + 1;
+
+										if (dropChange > 90) 
+											{
+											this->upgrades.add(Upgrade(
+												this->upgradeTextures,
+												this->enemies[j].getPosition(),
+												rand() % 5 , 150.f)
+												);
+											}
+									}
+								
 
 								if (this->players[i].gainExp(exp))
 								{
@@ -272,13 +383,13 @@ void Game::Update(const float &dt)
 									//text level up
 									this->textTags.add(
 										TextTag(
-											&this->font, "LEVEL UP!" ,
+											&this->font, "LEVEL UP!",
 											Color::Cyan,
 											Vector2f(this->players[i].getPosition().x + 20.f,
 												this->players[i].getPosition().y - 20.f),
 											Vector2f(0.f, -1.f),
-											36, 
-											34.f,true)
+											36,
+											40.f, true)
 									);
 								}
 								this->enemies.remove(j);
@@ -286,15 +397,19 @@ void Game::Update(const float &dt)
 								//gain exp
 								this->textTags.add(
 									TextTag(
-										&this->font, "+" + std::to_string(exp) +" xp",
+										&this->font, "+" + std::to_string(exp)
+										+ " ( x" + std::to_string(this->scoreMultiplier) + " ) "
+										+ " xp",
 										Color::Cyan,
 										Vector2f(this->players[i].getPosition().x + 20.f,
 											this->players[i].getPosition().y - 20.f),
-										Vector2f(0.f, 1.f),
-										26, 30.f
-									,true)
+										Vector2f(1.f, 0.f),
+										30, 40.f
+										, true)
 								);
 								
+								
+
 							}
 
 							return;
@@ -309,11 +424,29 @@ void Game::Update(const float &dt)
 					}
 				}
 			}
+			//update score
+			this->score = 0;
+			this->score += players[i].getScore();
+			this->scoreText.setString(
+				"Score: " + std::to_string(this->score) +
+				"\nMultipiler : " + std::to_string(this->scoreMultiplier) + "x" +
+				"\nMultipliler Timer: " + std::to_string((int)this->multiplierTimer) +
+				"\nNew Multipiler: " + std::to_string(this->multiplierAdder)
+				+ " / " +
+				std::to_string(this->multiplierAdderMax)
+			);
+
 		}
 		//update enemies
 		for (size_t i = 0; i < this->enemies.size(); i++)
 		{
 			this->enemies[i].Update(dt, this->players[this->enemies[i].getPlayerFollow()].getPosition());
+
+			//enemy bullet update
+			for (size_t k = 0; k < this->enemies[i].getBullets().size(); k++)
+			{
+				this->enemies[i].getBullets()[k].Update(dt);
+			}
 
 			//collision w/ player
 			for (size_t k = 0; k < this->players.size(); k++)
@@ -325,19 +458,19 @@ void Game::Update(const float &dt)
 					{
 						int damage = this->enemies[i].getDamage();
 
-
 						this->players[k].takeDamage(damage);
 
+						this->enemies[i].collision();
 
 						//text when collosion
 						this->textTags.add(
 							TextTag(
-								&this->font,"-"+std::to_string(damage), 
+								&this->font, "-" + std::to_string(damage),
 								Color::Red,
-									Vector2f(this->players[k].getPosition().x+20.f,
-										this->players[k].getPosition().y-20.f),
+								Vector2f(this->players[k].getPosition().x + 20.f,
+									this->players[k].getPosition().y - 20.f),
 								Vector2f(-1.f, 0.f),
-								30,20.f,true)
+								30, 20.f, true)
 						);
 
 						//player dead
@@ -366,12 +499,107 @@ void Game::Update(const float &dt)
 				this->textTags.remove(i);
 			}
 		}
+
+		//upgrade update
+		for (size_t i = 0; i < this->upgrades.size(); i++)
+		{
+			this->upgrades[i].Update(dt);
+
+			for (size_t k = 0; k < this->players.size(); k++)
+			{
+				if (this->upgrades[i].checkCollision(this->players[k].getGlobalBounds()))
+				{
+					switch (this->upgrades[i].getType())
+					{
+					case 0: // doubleray
+						if(this->players[k].getGunLevel()<1)
+						this->players[k].setGunlevel(1);
+
+						break;
+
+					case 1: // tripleray
+						if (this->players[k].getGunLevel() < 2)
+						this->players[k].setGunlevel(2);
+						break;
+
+					case 2: // piercing
+						this->players[k].enablePiercingShot();
+						break;
+
+					case 3: // shield
+						this->players[k].enableShield();
+						break;
+
+					case 4: // healthtank
+						this->players[k].upgradeHP();
+						break;
+					}
+					this->upgrades.remove(i);
+					return;
+				}
+				
+			}
+			if (this->upgrades[i].canDelete())
+			{
+				this->upgrades.remove(i);
+				break;
+			}
+		}
+
+		//pickup update
+		for (size_t i = 0; i < this->pickups.size(); i++)
+		{
+			this->pickups[i].Update(dt);
+
+			for (size_t k = 0; k < this->players.size(); k++)
+			{
+				if (this->pickups[i].checkColllision(this->players[k].getGlobalBounds()))
+				{
+					switch (this->pickups[i].getType())
+					{
+					case 0: // hp
+						this->players[k].gainHP(this->players[k].getHP() / 5);
+
+						break;
+
+					default:
+						break;
+
+					}
+
+					this->pickups.remove(i);
+					return;
+				}
+
+				
+			}	
+			if (this->pickups[i].canDelete())
+			{
+				this->pickups.remove(i);
+				break;
+			}
+		}
+
 	}
 }
-
 void Game::DrawUI()
 {
 
+
+	//draw text tag
+	for (size_t i = 0; i < this->textTags.size(); i++)
+	{
+		this->textTags[i].Draw(*this->window);
+	}
+
+	// over text!!
+	if (this->playersAlive <= 0)
+	{
+		this->window->draw(this->gameOverText);
+	}
+
+	//score
+	this->window->draw(this->scoreText);
 }
 
 void Game::Draw()
@@ -404,17 +632,20 @@ void Game::Draw()
 		this->window->draw(this->enemyText);
 	}
 
-	//draw text tag
-	for (size_t i = 0; i < this->textTags.size(); i++)
+	//draw pickups
+	for (size_t i = 0; i <this->pickups.size(); i++)
 	{
-		this->textTags[i].Draw(*this->window);
+		this->pickups[i].Draw(*this->window);
+
 	}
 
-	// over text!!
-	if (this->playersAlive <= 0)
+	//draw upgrade
+	for (size_t i = 0; i < this->upgrades.size(); i++)
 	{
-		this->window->draw(this->gameOverText);
+		this->upgrades[i].Draw(*this->window);
 	}
+
+	this->DrawUI();
 
 	this->window->display();
 }
