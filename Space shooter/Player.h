@@ -114,7 +114,7 @@ public:
 	inline void enableDualMissile02() { this->dualMissiles02 = true; }
 	inline void enableShield() { this->shield = true; }
 	inline void upgradeHP() { 
-		int temp = rand() % 7;
+		int temp = rand() % level +2;
 		this->hpMax += temp; 
 		this->hp += temp;
 				}

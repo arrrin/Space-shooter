@@ -69,7 +69,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 		this->damageMax = (rand() % 2 + 1) * scalar;
 		this->damageMin = (rand() % 1 + 1) * scalar;
 
-		this->maxVelocity = rand() % 8 + 5;
+		this->maxVelocity = rand() % 11 + 8;
 
 		break;
 

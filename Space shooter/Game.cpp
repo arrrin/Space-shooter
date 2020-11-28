@@ -26,9 +26,15 @@ Game::Game(RenderWindow *window)
 		this->lWingTextures,this->rWingTextures,
 		this->cPitTextures,this->auraTextures));
 
+	/*this->players.add(Player(this->textures,
+		this->lWingTextures, this->rWingTextures,
+		this->cPitTextures, this->auraTextures,
+		Keyboard::Key::Up, Keyboard::Key::Down, 
+		Keyboard::Key::Left, Keyboard::Key::Right, Keyboard::Key::Enter ));*/
+
 	this->playersAlive = this->players.size();	
 
-	this->enemySpawnTimerMax = 25;
+	this->enemySpawnTimerMax = 20;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
 
 
@@ -515,15 +521,48 @@ void Game::Update(const float& dt)
 						if(this->players[k].getGunLevel()<1)
 						this->players[k].setGunlevel(1);
 
+						this->textTags.add(
+							TextTag(
+								&this->font, "Double Ray upgrade!",
+								Color::Blue,
+								Vector2f(this->players[i].getPosition().x + 20.f,
+									this->players[i].getPosition().y - 20.f),
+								Vector2f(0.f, -1.f),
+								40, 45.f
+								, true));
+
 						break;
 
 					case 1: // tripleray
 						if (this->players[k].getGunLevel() < 2)
 						this->players[k].setGunlevel(2);
+					
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "Triple Ray upgrade!",
+								Color::Magenta,
+								Vector2f(this->players[i].getPosition().x + 20.f,
+									this->players[i].getPosition().y - 20.f),
+								Vector2f(0.f, -1.f),
+								40, 45.f
+								, true));
+
 						break;
 
 					case 2: // piercing
 						this->players[k].enablePiercingShot();
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "Enable PIERCING SHOT!",
+								Color::Yellow,
+								Vector2f(this->players[i].getPosition().x + 20.f,
+									this->players[i].getPosition().y - 20.f),
+								Vector2f(0.f, -1.f),
+								40, 45.f
+								, true));
+
 						break;
 
 					case 3: // shield
@@ -532,6 +571,17 @@ void Game::Update(const float& dt)
 
 					case 4: // healthtank
 						this->players[k].upgradeHP();
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "HP MAX INCREASE!",
+								Color(255,165,0),
+								Vector2f(this->players[i].getPosition().x + 20.f,
+									this->players[i].getPosition().y - 20.f),
+								Vector2f(0.f, -1.f),
+								40, 45.f
+								, true));
+
 						break;
 					}
 					this->upgrades.remove(i);
@@ -555,10 +605,23 @@ void Game::Update(const float& dt)
 			{
 				if (this->pickups[i].checkColllision(this->players[k].getGlobalBounds()))
 				{
+					
 					switch (this->pickups[i].getType())
 					{
+
 					case 0: // hp
+						
 						this->players[k].gainHP(this->players[k].getHP() / 5);
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "HP GAIN + " + std::to_string(this->players[k].getHP() / 5),
+								Color::Green,
+								Vector2f(this->players[i].getPosition().x + 20.f,
+									this->players[i].getPosition().y - 20.f),
+								Vector2f(0.f, -1.f),
+								30, 40.f
+								, true) );
 
 						break;
 

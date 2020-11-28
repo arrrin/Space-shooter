@@ -18,7 +18,7 @@ Player::Player(std::vector<Texture>& textures,
 	:level(1),exp(0),expNext(10),
 	hp(10),hpMax(10),
 	statPoint(0),cooling(0), plating(0),wiring(0),power(0),
-	damage(1),damageMax(2),
+	damage(1),damageMax(2),   
 	score(0)
 {
 	//dt
@@ -253,7 +253,7 @@ bool Player::UpdateLeveling()
 
 void Player::changeAccessories()
 {
-	if (Keyboard::isKeyPressed(Keyboard::Up) && this->keyTime >= keyTimeMax)
+	if (Keyboard::isKeyPressed(Keyboard::Num0) && this->keyTime >= keyTimeMax)
 	{
 		if (lWingSelect < (*this->lWingTextures).size() - 1 && 
 			rWingSelect < (*this->rWingTextures).size() - 1 &&
