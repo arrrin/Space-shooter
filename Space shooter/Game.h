@@ -14,6 +14,14 @@ private:
 	float multiplierTimer;
 	int multiplierAdder;
 	int multiplierAdderMax;
+	
+	bool paused;
+
+	float keyTime;
+	float keyTimeMax;
+
+	int difficulty;
+	float difficultyTimer;
 
 	//Text
 	Font font;
@@ -22,6 +30,7 @@ private:
 	Text enemyText;
 	Text gameOverText;
 	Text scoreText;
+	Text controlsText;
 	
 	//UI
 

@@ -11,7 +11,7 @@ private:
 	void initialize(unsigned from);
 	void expand();
 public:
-	dArr(unsigned cap = 50);
+	dArr(unsigned cap = 5);
 	dArr(const dArr& obj);
 	~dArr();
 

@@ -1,6 +1,8 @@
 #include "Player.h"
 
 unsigned Player::players = 0;
+dArr<Texture> Player::mainGunTextures;
+
 
 enum controls {up=0,down,left,right,shoot};
 enum weapon { LASER = 0, MISSILE01, MISSILE02 };
@@ -39,6 +41,15 @@ Player::Player(std::vector<Texture>& textures,
 		this->sprite.getGlobalBounds().height / 2;
 
 	//Textures & sprite
+	//Player guns
+	Texture temp;
+	temp.loadFromFile("Textures/Guns/gun01.png");
+	Player::mainGunTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Guns/gun02.png");
+	Player::mainGunTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Guns/gun03.png");
+	Player::mainGunTextures.add(Texture(temp));
+
 	this->lWingTextures = &lWingTextures;
 	this->rWingTextures = &rWingTextures;
 	this->cPitTextures = &cPitTextures;
@@ -51,12 +62,13 @@ Player::Player(std::vector<Texture>& textures,
 	this->laserTexture = &textures[1];
 	this->missile01Texture = &textures[2];
 
-	this->mainGunSprite.setTexture(textures[3]);
+	this->mainGunSprite.setTexture(Player::mainGunTextures[0]);
 	this->mainGunSprite.setOrigin(
 		this->mainGunSprite.getGlobalBounds().width / 2,
 		this->mainGunSprite.getGlobalBounds().height / 2
 			);
 	this->mainGunSprite.rotate(90);
+	this->mainGunSprite.setScale(0.9f,0.9f);
 
 	// set position gun to follow player
 	this->mainGunSprite.setPosition(
@@ -222,6 +234,37 @@ void Player::gainHP(int hp)
 void Player::setGunlevel(int gunLevel)
 {
 	this->mainGunLevel = gunLevel;
+
+	if (this->mainGunLevel < Player::mainGunTextures.size())
+		this->mainGunSprite.setTexture(Player::mainGunTextures[this->mainGunLevel]);
+	else
+		std::cout << "NO TEXTURE FOR THAT MAIN GUN!" << "\n";
+}
+
+void Player::Reset()
+{
+	this->hpMax = 10;
+	this->hp = this->hpMax;
+	this->sprite.setPosition(Vector2f(100.f, 100.f));
+	this->bullets.clear();
+	this->setGunlevel(0);
+	this->wiring = 0;
+	this->cooling = 0;
+	this->power = 0;
+	this->plating = 0;
+	this->dualMissiles01 = false;
+	this->dualMissiles02 = false;
+	this->shield = false;
+	this->piercingShot = false;
+	this->currentVelo.x = 0 ;
+	this->currentVelo.y = 0;
+	this->level = 1;
+	this->exp = 0;
+	this->expNext = 20;
+	this->currentWeapons = LASER;
+	this->statPoint = 0;
+	this->shootTimer = this->shootTimerMax;
+
 }
 
 bool Player::UpdateLeveling()

@@ -122,6 +122,7 @@ public:
 	inline const int& getGunLevel()const { return this->mainGunLevel; }
 
 	//function
+	void Reset();
 	bool UpdateLeveling();
 	void changeAccessories();
 	void UpdateAccessories(const float& dt);
@@ -132,6 +133,10 @@ public:
 
 	//static
 	static unsigned players;
+
+	//static textures
+	static dArr<Texture> mainGunTextures;
+
 
 	//normal func
 	float vectorLength(Vector2f v)

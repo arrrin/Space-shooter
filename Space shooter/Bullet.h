@@ -23,7 +23,7 @@ public:
 
 	inline FloatRect getGlobalBounds()const { return this->sprite.getGlobalBounds(); }
 	inline const Vector2f& getPosition()const { return this->sprite.getPosition(); }
-
+	inline void setPosition(Vector2f position) { this->sprite.setPosition(position); }
 
 
 	void movement(const float& dt);
