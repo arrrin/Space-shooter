@@ -124,7 +124,7 @@ public:
 	//function
 	void Reset();
 	bool UpdateLeveling();
-	void changeAccessories();
+	void changeAccessories(const float& dt);
 	void UpdateAccessories(const float& dt);
 	void Movement(Vector2u windowBound,const float& dt);
 	void Combat(const float& dt);

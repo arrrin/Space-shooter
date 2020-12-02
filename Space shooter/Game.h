@@ -43,6 +43,10 @@ private:
 	dArr<Player> players;
 	int playersAlive;
 
+	//map
+	Sprite map;
+	Texture mapTexture;
+
 	//Enemies
 	dArr<Enemy> enemies;
 	std::vector<Enemy> enemiesSaved;

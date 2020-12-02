@@ -58,6 +58,7 @@ Player::Player(std::vector<Texture>& textures,
 	this->sprite.setTexture(textures[0]);
 	this->sprite.setScale(0.09f, 0.09f);
 	this->sprite.setColor(Color(10, 10, 10, 255));
+	
 
 	this->laserTexture = &textures[1];
 	this->missile01Texture = &textures[2];
@@ -81,9 +82,9 @@ Player::Player(std::vector<Texture>& textures,
 
 
 	//select accessory
-	this->lWingSelect = 1;
-	this->rWingSelect = 1;
-	this->cPitSelect = 1;
+	this->lWingSelect = 9;
+	this->rWingSelect =9;
+	this->cPitSelect =9;
 	this->auraSelect = 0;
 
 	//acessory texture
@@ -294,9 +295,9 @@ bool Player::UpdateLeveling()
 	return false;
 }
 
-void Player::changeAccessories()
+void Player::changeAccessories(const float& dt)
 {
-	if (Keyboard::isKeyPressed(Keyboard::Num0) && this->keyTime >= keyTimeMax)
+	if (Keyboard::isKeyPressed(Keyboard::Up) && this->keyTime >= keyTimeMax)
 	{
 		if (lWingSelect < (*this->lWingTextures).size() - 1 && 
 			rWingSelect < (*this->rWingTextures).size() - 1 &&
@@ -618,7 +619,7 @@ void Player::Update(Vector2u windowBounds, const float& dt)
 		this->keyTime += 1.f * dt * this->dtMultipiler;
 
 	this->Movement(windowBounds, dt);
-	this->changeAccessories();
+	this->changeAccessories(dt);
 	this->UpdateAccessories(dt);
 	this->Combat(dt);
 

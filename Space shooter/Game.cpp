@@ -14,7 +14,7 @@ Game::Game(RenderWindow *window)
 	this->multiplierTimerMax =200.f;
 	this->multiplierTimer = this->multiplierTimerMax;
 
-	this->paused = true;
+	this->paused = false;
 	
 	//init font
 	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
@@ -59,6 +59,9 @@ void Game::initTextures()
 	this->textures.push_back(Texture());
 	this->textures[mainGun01].loadFromFile("Textures/Guns/gun01.png");
 
+	//Map texture
+	this->mapTexture.loadFromFile("Textures/spacemap.png");
+	this->map.setTexture(mapTexture);
 
 	Texture temp;
 	temp.loadFromFile("Textures/enemyMoveLeft.png");
@@ -275,7 +278,7 @@ void Game::Update(const float& dt)
 		{
 			if (this->players[i].isAlive())
 			{
-				this->players[i].changeAccessories();
+				this->players[i].changeAccessories(dt);
 			}
 		}
 	}
@@ -766,7 +769,6 @@ void Game::Update(const float& dt)
 void Game::DrawUI()
 {
 
-
 	//draw text tag
 	for (size_t i = 0; i < this->textTags.size(); i++)
 	{
@@ -782,16 +784,17 @@ void Game::DrawUI()
 	//score
 	this->window->draw(this->scoreText);
 
-
+	
 	//pause
 	if (this->paused)
 		this->window->draw(this->controlsText);
+
 }
 
 void Game::Draw()
 {
 	this->window->clear();
-
+	this->window->draw(this->map);
 	//draw player
 	for (size_t i = 0; i < this->players.size(); i++)
 	{
