@@ -38,6 +38,8 @@ Game::Game(RenderWindow *window)
 	this->enemySpawnTimerMax = 30;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
 
+	//Init boss
+	this->bossEncounter = false;
 
 	this->initUI();
 }
@@ -60,17 +62,9 @@ void Game::initTextures()
 	this->textures[mainGun01].loadFromFile("Textures/Guns/gun01.png");
 
 	//Map texture
+	Texture temp;
 	this->mapTexture.loadFromFile("Textures/spacemap.png");
 	this->map.setTexture(mapTexture);
-
-	Texture temp;
-	temp.loadFromFile("Textures/enemyMoveLeft.png");
-	this->enemyTextures.add(Texture(temp));
-	temp.loadFromFile("Textures/enemyFollow.png");
-	this->enemyTextures.add(Texture(temp));
-	temp.loadFromFile("Textures/enemyMoveLeftShoot.png");
-	this->enemyTextures.add(Texture(temp));
-
 
 	//pickup
 	temp.loadFromFile("Textures/Pickups/hpSupply.png");
@@ -92,10 +86,27 @@ void Game::initTextures()
 	temp.loadFromFile("Textures/Upgrades/healthtank.png");
 	this->upgradeTextures.add(Texture(temp));
 
+	//enemies
+
+	temp.loadFromFile("Textures/enemyMoveLeft.png");
+	this->enemyTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/enemyFollow.png");
+	this->enemyTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/enemyMoveLeftShoot.png");
+	this->enemyTextures.add(Texture(temp));
 
 	//enemy bullet
 	temp.loadFromFile("Textures/Guns/roundBulletRed.png");
 	this->enemyBulletTextures.add(Texture(temp));
+
+	//Boss texture
+	temp.loadFromFile("Textures/Bosses/Bodies/BossBody01.png");
+	this->bossBodyTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Bosses/Guns/BossGun01.png");
+	this->bossGunTextures.add(Texture(temp)); 
+	temp.loadFromFile("Textures/Bosses/Bullets/BossBullet01.png");
+	this->bossBulletTextures.add(Texture(temp));
+
 
 	//init texture folders accesory
 	std::ifstream in;
@@ -294,9 +305,13 @@ void Game::Update(const float& dt)
 
 		std::cout << this->difficultyTimer << "\n";
 
-		if ((int)this->difficultyTimer % 1000 == 0 && this->enemySpawnTimer>10)
+		if ((int)this->difficultyTimer % 1000 == 0 && this->enemySpawnTimer > 10)
 		{
-			this->enemySpawnTimerMax--;
+			if (this->enemySpawnTimerMax > 10) 
+			{
+				this->enemySpawnTimerMax--;
+			}
+			
 			this->difficulty++;
 			this->difficultyTimer = 1.f;
 		}
@@ -499,7 +514,11 @@ void Game::Update(const float& dt)
 			}
 			//update score
 			this->score = 0;
-			this->score += players[i].getScore();
+			for (size_t k = 0; k < players.size(); k++)
+			{
+				this->score += players[k].getScore();
+			}
+			
 			this->scoreText.setString(
 				"Score: " + std::to_string(this->score) +
 				"\nMultipiler : " + std::to_string(this->scoreMultiplier) + "x" +
@@ -757,11 +776,13 @@ void Game::Update(const float& dt)
 			this->scoreMultiplier = 1;
 			this->multiplierAdder = 0;
 			this->difficulty = 0;
+			this->bossEncounter = false;
 			this->enemySpawnTimerMax = 30.f;
 			this->enemies.clear();
 			this->upgrades.clear();
 			this->pickups.clear();
 			this->textTags.clear();
+			this->bosses.clear();
 		}
 	}
 }

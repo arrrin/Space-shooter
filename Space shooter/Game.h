@@ -1,7 +1,7 @@
 #pragma once
 #include"Player.h"
 #include"Enemy.h"
-
+#include"Boss.h"
 class Game
 {
 private:
@@ -22,6 +22,8 @@ private:
 
 	int difficulty;
 	float difficultyTimer;
+	
+	Clock bossTimer;
 
 	//Text
 	Font font;
@@ -53,22 +55,34 @@ private:
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 
+	//bosses
+	bool bossEncounter;
+	dArr<Boss> bosses;
+
 	//pickups
 	dArr<Pickup> pickups;
 	
 	//upgrades
 	dArr<Upgrade> upgrades;
 
-	//texture
+	//player texture
 	std::vector<Texture> textures;
+		//wing texture
+		dArr<Texture> lWingTextures;
+		dArr<Texture> rWingTextures;
+		dArr<Texture> cPitTextures;
+		dArr<Texture> auraTextures;
+		
+	//enemy textures
 	dArr<Texture> enemyTextures;
 	dArr<Texture> enemyBulletTextures;
 
-	dArr<Texture> lWingTextures;
-	dArr<Texture> rWingTextures;
-	dArr<Texture> cPitTextures;
-	dArr<Texture> auraTextures;
-	
+	//Boss textures
+	dArr<Texture> bossBodyTextures;
+	dArr<Texture> bossGunTextures;
+	dArr<Texture> bossBulletTextures;
+
+	//other textures
 	dArr<Texture> pickupTextures;
 	dArr<Texture> upgradeTextures;
 

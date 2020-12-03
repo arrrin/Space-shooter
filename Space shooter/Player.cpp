@@ -58,6 +58,7 @@ Player::Player(std::vector<Texture>& textures,
 	this->sprite.setTexture(textures[0]);
 	this->sprite.setScale(0.09f, 0.09f);
 	this->sprite.setColor(Color(10, 10, 10, 255));
+	this->sprite.setPosition(100.f, 520.f);
 	
 
 	this->laserTexture = &textures[1];

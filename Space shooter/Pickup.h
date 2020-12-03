@@ -1,6 +1,5 @@
 #pragma once
 #include"Upgrade.h"
-
 class Pickup
 {
 private:
