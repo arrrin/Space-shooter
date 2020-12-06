@@ -83,9 +83,9 @@ Player::Player(std::vector<Texture>& textures,
 
 
 	//select accessory
-	this->lWingSelect = 9;
-	this->rWingSelect =9;
-	this->cPitSelect =9;
+	this->lWingSelect = 10;
+	this->rWingSelect =10;
+	this->cPitSelect =10;
 	this->auraSelect = 0;
 
 	//acessory texture
@@ -323,6 +323,7 @@ void Player::UpdateStats()
 	this->hpMax += plating * 5.f;
 	this->damageMax += power * 2;
 	this->damage += power;
+	this->shootTimerMax -= (cooling*0.05);
 }
 
 void Player::changeAccessories(const float& dt)

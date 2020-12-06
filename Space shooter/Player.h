@@ -114,12 +114,14 @@ public:
 	inline void enableDualMissile01() { this->dualMissiles01 = true; }
 	inline void enableDualMissile02() { this->dualMissiles02 = true; }
 	inline void enableShield() { this->shield = true; }
+	inline void disableShield() { this->shield = false; }
 	inline void upgradeHP() { 
 		int temp = rand() % level +2;
 		this->hpMax += temp; 
 		this->hp += temp;
 				}
 	inline bool getPiercingShot()const { return this->piercingShot; }
+	inline bool getShield()const { return this->shield; }
 	inline const int& getGunLevel()const { return this->mainGunLevel; }
 
 	inline void addStatPoint() { this->statPoint++; }

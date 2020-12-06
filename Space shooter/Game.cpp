@@ -15,20 +15,24 @@ Game::Game(RenderWindow *window)
 	this->multiplierTimer = this->multiplierTimerMax;
 
 	//Upgrades counter
-	this->keyTimeDoubleRay = 0.f;
-	this->keyTimeDoubleRayMax = 1500.f;
+	this->keyTimeDoubleRayMax = 1201.f;
+	this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
 
-	this->keyTimeTripleRay = 0.f;
-	this->keyTimeTripleRayMax =750.f;
+	this->keyTimeTripleRayMax =701.f;
+	this->keyTimeTripleRay = this->keyTimeTripleRayMax;
 
-	this->keyTimePiercingShot = 0.f;
-	this->keyTimePiercingShotMax = 1000.f;
+	this->keyTimePiercingShotMax =601.f;
+	this->keyTimePiercingShot = this->keyTimePiercingShotMax;
+
+	this->keyTimeShieldMax = 401.f;
+	this->keyTimeShield = this->keyTimeShieldMax;
 
 	this->paused = false;
 	
 	//init font
 	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
-
+	this->font1.loadFromFile("Fonts/ethnocentric.ttf");
+	
 	//init texture
 	this->initTextures();
 	
@@ -183,11 +187,13 @@ void Game::initTextures()
 	}
 	in.close();
 
+	//Particle
+	Particle::initTextures();
+
 }
 
 void Game::initUI()
 {
-
 		//Follow text
 		this->followPlayerText.setFont(font);
 		this->followPlayerText.setCharacterSize(15);
@@ -196,9 +202,64 @@ void Game::initUI()
 		this->staticPlayerText.setFont(font);
 		this->staticPlayerText.setCharacterSize(15);
 
+			//upgrades text
+			this->doubleRayText.setFont(this->font1);
+			this->doubleRayText.setCharacterSize(15);
+			this->doubleRayText.setFillColor(Color::Black);
+			this->doubleRayText.setString("DOUBLE RAY");
+			this->doubleRayText.setPosition(1700.f, 20.f);
 
+			this->tripleRayText.setFont(this->font1);
+			this->tripleRayText.setCharacterSize(15);
+			this->tripleRayText.setFillColor(Color::Black);
+			this->tripleRayText.setString("TRIPLE RAY");
+			this->tripleRayText.setPosition(1700.f, 60.f);
+
+			this->piercingShotText.setFont(this->font1);
+			this->piercingShotText.setCharacterSize(15);
+			this->piercingShotText.setFillColor(Color::Black);
+			this->piercingShotText.setString("PIERCING SHOT");
+			this->piercingShotText.setPosition(1700.f, 100.f);
+
+			this->shieldText.setFont(this->font1);
+			this->shieldText.setCharacterSize(15);
+			this->shieldText.setFillColor(Color::Black);
+			this->shieldText.setString("INVISIBLE");
+			this->shieldText.setPosition(1700.f, 140.f);
+
+		//Exp bar
 	this->playerExpBar.setSize(Vector2f(90.f, 10.f));
 	this->playerExpBar.setFillColor(Color(0.f, 90.f, 200.f, 200.f));
+
+	//upgrades bar
+	this->shieldBar.setSize(Vector2f(200.f, 20.f));
+	this->shieldBar.setFillColor(Color::Cyan);
+		this->shieldOutline.setSize(Vector2f(200.f, 20.f));
+		this->shieldOutline.setOutlineThickness(2);
+		this->shieldOutline.setFillColor(Color(100, 100, 100, 0));
+		this->shieldOutline.setOutlineColor(Color::White);
+
+	this->doubleRayBar.setSize(Vector2f(200.f, 20.f));
+	this->doubleRayBar.setFillColor(Color::Magenta);
+		this->doubleRayOutline.setSize(Vector2f(200.f, 20.f));
+		this->doubleRayOutline.setOutlineThickness(2);
+		this->doubleRayOutline.setFillColor(Color(100, 100, 100, 0));
+		this->doubleRayOutline.setOutlineColor(Color::White);
+
+	this->tripleRayBar.setSize(Vector2f(200.f, 20.f));
+	this->tripleRayBar.setFillColor(Color::Red);
+		this->tripleRayOutline.setSize(Vector2f(200.f, 20.f));
+		this->tripleRayOutline.setOutlineThickness(2);
+		this->tripleRayOutline.setFillColor(Color(100, 100, 100, 0));
+		this->tripleRayOutline.setOutlineColor(Color::White);
+
+	this->piercingShotBar.setSize(Vector2f(200.f, 20.f));
+	this->piercingShotBar.setFillColor(Color::Yellow);
+		this->piercingOutline.setSize(Vector2f(200.f, 20.f));
+		this->piercingOutline.setOutlineThickness(2);
+		this->piercingOutline.setFillColor(Color(100, 100, 100, 0));
+		this->piercingOutline.setOutlineColor(Color::White);
+
 
 	this->enemyText.setFont(this->font);
 	this->enemyText.setCharacterSize(14);
@@ -207,7 +268,7 @@ void Game::initUI()
 	this->gameOverText.setFillColor(Color::Red);
 	this->gameOverText.setCharacterSize(40);
 	this->gameOverText.setString("GAME OVER!!");
-	this->gameOverText.setPosition( 100.f,this->window->getSize().y /2);
+	this->gameOverText.setPosition( 100.f, this->window->getSize().y /2);
 
 	this->scoreText.setFont(this->font);
 	this->scoreText.setFillColor(Color(200,200,200,150));
@@ -224,6 +285,7 @@ void Game::initUI()
 			));
 	this->controlsText.setPosition(10.f, 700.f);
 
+	
 
 }
 
@@ -260,7 +322,61 @@ void Game::UpdateUIPlayer(int index)
 		static_cast<float>(this->players[index].getExp())/this->players[index].getExpNext()
 		, 1.f
 	);
-	
+		//shield
+	this->shieldBar.setPosition(1700.f, 140.f);
+	this->shieldOutline.setPosition(1700.f, 140.f);
+	this->shieldBar.setScale(
+		static_cast<float>(this->keyTimeShield) / this->keyTimeShieldMax, 1.f);
+		if ((int)(this->keyTimeShield) % 5 == 0)
+		{
+			this->shieldBar.setFillColor(Color::White);
+		}
+		else
+		{
+			this->shieldBar.setFillColor(Color::Cyan);
+		}
+		//double ray
+	this->doubleRayBar.setPosition(1700.f, 20.f);
+	this->doubleRayOutline.setPosition(1700.f, 20.f); 
+	this->doubleRayBar.setScale(
+		static_cast<float>(this->keyTimeDoubleRay) / this->keyTimeDoubleRayMax, 1.f
+		);
+		if ((int)(this->keyTimeDoubleRay) % 5 == 0)
+		{
+			this->doubleRayBar.setFillColor(Color::White);
+		}
+		else
+		{
+			this->doubleRayBar.setFillColor(Color::Magenta);
+		}
+		//triple ray
+	this->tripleRayBar.setPosition(1700.f, 60.f);
+	this->tripleRayOutline.setPosition(1700.f, 60.f);
+	this->tripleRayBar.setScale(
+		static_cast<float>(this->keyTimeTripleRay) / this->keyTimeTripleRayMax, 1.f
+	);
+		if ((int)(this->keyTimeTripleRay) % 5 == 0)
+		{
+			this->tripleRayBar.setFillColor(Color::White);
+		}
+		else
+		{
+			this->tripleRayBar.setFillColor(Color::Red);
+		}
+		//piercing 
+	this->piercingShotBar.setPosition(1700.f, 100.f);
+	this->piercingOutline.setPosition(1700.f, 100.f);
+	this->piercingShotBar.setScale(
+		static_cast<float>(this->keyTimePiercingShot) / this->keyTimePiercingShotMax, 1.f
+	);
+		if ((int)(this->keyTimePiercingShot) % 5 == 0)
+		{
+			this->piercingShotBar.setFillColor(Color::White);
+		}
+		else
+		{
+			this->piercingShotBar.setFillColor(Color::Yellow);
+		}
 }
 
 void Game::UpdateUIEnemy(int index)
@@ -324,12 +440,12 @@ void Game::enemyTimerUpdate(const float& dt)
 void Game::upgradesTimerUpdate(const float& dt)
 {
 	//Double ray keytime
-	if (this->keyTimeDoubleRay > 0)
+	if (this->keyTimeDoubleRay < this->keyTimeDoubleRayMax)
 	{
-		this->keyTimeDoubleRay += 1.f * dt * this->dtMultiplier;
-		if (this->keyTimeDoubleRay > this->keyTimeDoubleRayMax)
+		this->keyTimeDoubleRay -= 1.f * dt * this->dtMultiplier;
+		if (this->keyTimeDoubleRay <=1.f)
 		{
-			this->keyTimeDoubleRay = 0.f;
+			this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
 			for (size_t i = 0; i < players.size(); i++)
 			{
 				this->players[i].setGunlevel(0);
@@ -338,12 +454,12 @@ void Game::upgradesTimerUpdate(const float& dt)
 		std::cout << "double ray time left : " << keyTimeDoubleRay << "\n";
 	}
 	//triple keytime
-	if (this->keyTimeTripleRay > 0)
+	if (this->keyTimeTripleRay < this->keyTimeTripleRayMax)
 	{
-		this->keyTimeTripleRay += 1.f * dt * this->dtMultiplier;
-		if (this->keyTimeTripleRay > this->keyTimeTripleRayMax)
+		this->keyTimeTripleRay -= 1.f * dt * this->dtMultiplier;
+		if (this->keyTimeTripleRay <=1.f)
 		{
-			this->keyTimeTripleRay = 0.f;
+			this->keyTimeTripleRay = this->keyTimeTripleRayMax;
 			for (size_t i = 0; i < players.size(); i++)
 			{
 				this->players[i].setGunlevel(0);
@@ -351,19 +467,33 @@ void Game::upgradesTimerUpdate(const float& dt)
 		}
 		std::cout << "triple ray time left : " << keyTimeTripleRay << "\n";
 	}
-	//
-	if (this->keyTimePiercingShot > 0)
+	// piercing shot keytime
+	if (this->keyTimePiercingShot < this->keyTimePiercingShotMax)
 	{
-		this->keyTimePiercingShot += 1.f * dt * this->dtMultiplier;
-		if (this->keyTimePiercingShot > this->keyTimePiercingShotMax)
+		this->keyTimePiercingShot -= 1.f * dt * this->dtMultiplier;
+		if (this->keyTimePiercingShot <=1.f)
 		{
-			this->keyTimePiercingShot = 0.f;
+			this->keyTimePiercingShot =this->keyTimePiercingShotMax;
 			for (size_t i = 0; i < players.size(); i++)
 			{
 				this->players[i].disablePiercingShot();
 			}
 		}
-		std::cout << "Piercing shot left : " << keyTimeTripleRay << "\n";
+		std::cout << "Piercing shot left : " << keyTimePiercingShot << "\n";
+	}
+	//shield keyTime
+	if (this->keyTimeShield < this->keyTimeShieldMax)
+	{
+		this->keyTimeShield -= 1.f * dt * this->dtMultiplier;
+		if (this->keyTimeShield <=1.f)
+		{
+			this->keyTimeShield = this->keyTimeShieldMax;
+			for (size_t i = 0; i < players.size(); i++)
+			{
+				this->players[i].disableShield();
+			}
+		}
+		std::cout << "Shield left : " << keyTimeShield << "\n";
 	}
 }
 
@@ -443,12 +573,12 @@ void Game::playerUpdate(const float& dt)
 					if (this->players[i].getBullets(k).getGlobalBounds().intersects(this->enemies[j].getGlobalBounds()))
 					{
 
-						//piercing
+						//not piercing
 						if (!this->players[i].getPiercingShot())
 						{
 							this->players[i].removeBullet(k);
-
 						}
+						//pierce
 						else
 						{
 							this->players[i].getBullets(k).setPosition(
@@ -456,12 +586,27 @@ void Game::playerUpdate(const float& dt)
 									this->players[i].getBullets(k).getPosition().y)
 							);
 						}
+
 						//take dmg
 						int damage = this->players[i].getDamage();
 						if (this->enemies[j].getHP() > 0)
 						{
 							this->enemies[j].takeDamage(damage);
 
+							//Add particles on damage
+							int nrOfPart = rand() % 2 + 1;
+							for (size_t l = 0; l < nrOfPart; l++)
+							{
+								this->particles.add(Particle(
+									 this->enemies[j].getPosition(),
+									0,
+									Vector2f(1.f,0.f),
+									rand() % 10 + 4,
+									rand() % 20,
+									30.f,
+									Color(255, 255, 255, 255)
+								));
+							}
 							//text when shoot
 							this->textTags.add(
 								TextTag(
@@ -478,6 +623,20 @@ void Game::playerUpdate(const float& dt)
 						//enemy dead
 						if (this->enemies[j].getHP() <= 0)
 						{
+							//Particle enemy dead
+							int nrOfPart = rand() % 8 + 5;
+							for (size_t l = 0; l < nrOfPart; l++)
+							{
+								this->particles.add(Particle(
+									this->enemies[j].getPosition(),
+									0,
+									Vector2f(1.f,0.f),
+									rand() % 12 + 6,
+									rand() % 20,
+									40.f,
+									Color(255, 255, 255, 255)
+								));
+							}
 							//exp gain
 							int exp = this->enemies[j].getHPMax() +
 								(rand() % this->enemies[j].getHPMax() + 1 *
@@ -503,7 +662,7 @@ void Game::playerUpdate(const float& dt)
 							);
 
 							int dropChange = rand() & 100 + 1;
-
+							// pick up drop
 							if (dropChange < 50)
 							{
 								dropChange = rand() & 100 + 1;
@@ -522,7 +681,7 @@ void Game::playerUpdate(const float& dt)
 							{
 								dropChange = rand() % 100 + 1;
 
-								if (dropChange > 90)
+								if (dropChange < 90)
 								{
 									this->upgrades.add(Upgrade(
 										this->upgradeTextures,
@@ -616,33 +775,35 @@ void Game::enemiesUpdate(const float& dt)
 		//collision w/ player
 		for (size_t k = 0; k < this->players.size(); k++)
 		{
-			if (this->players[k].isAlive())
-			{
-				if (this->players[k].getGlobalBounds().intersects(this->enemies[i].getGlobalBounds())
-					&& !this->players[k].isDamagedCooldown())
+			if (!this->players[k].getShield()) {
+				if (this->players[k].isAlive())
 				{
-					int damage = this->enemies[i].getDamage();
+					if (this->players[k].getGlobalBounds().intersects(this->enemies[i].getGlobalBounds())
+						&& !this->players[k].isDamagedCooldown())
+					{
+						int damage = this->enemies[i].getDamage();
 
-					this->players[k].takeDamage(damage);
+						this->players[k].takeDamage(damage);
 
-					this->enemies[i].collision();
+						this->enemies[i].collision();
 
-					//text when collosion
-					this->textTags.add(
-						TextTag(
-							&this->font, "-" + std::to_string(damage),
-							Color::Red,
-							Vector2f(this->players[k].getPosition().x + 20.f,
-								this->players[k].getPosition().y - 20.f),
-							Vector2f(-1.f, 0.f),
-							30, 20.f, true)
-					);
+						//text when collosion
+						this->textTags.add(
+							TextTag(
+								&this->font, "-" + std::to_string(damage),
+								Color::Red,
+								Vector2f(this->players[k].getPosition().x + 20.f,
+									this->players[k].getPosition().y - 20.f),
+								Vector2f(-1.f, 0.f),
+								30, 20.f, true)
+						);
 
-					//player dead
-					if (!this->players[k].isAlive())
-						this->playersAlive--;
+						//player dead
+						if (!this->players[k].isAlive())
+							this->playersAlive--;
 
-					return;
+						return;
+					}
 				}
 			}
 		}
@@ -652,6 +813,21 @@ void Game::enemiesUpdate(const float& dt)
 			this->enemies.remove(i);
 			return;
 		}
+	}
+}
+
+void Game::particleUpdate(const float& dt)
+{
+	bool particleRemoved = false;
+	for (size_t i = 0; i < this->particles.size() && !particleRemoved; i++)
+	{
+		this->particles[i].update(dt);
+
+		if (this->particles[i].readyToDel())
+			particleRemoved = true;
+
+		if (particleRemoved)
+			this->particles.remove(i);
 	}
 }
 
@@ -681,10 +857,10 @@ void Game::upgradesUpdate(const float& dt)
 				switch (this->upgrades[i].getType())
 				{
 				case 0: // doubleray
-					if (this->players[k].getGunLevel() < 1)
+					if (this->players[k].getGunLevel() <= 1)
 					{
 						this->players[k].setGunlevel(1);
-						this->keyTimeDoubleRay = 1.f;
+						this->keyTimeDoubleRay = this->keyTimeDoubleRayMax-1;
 
 						//DOUBLE RAY TEXT TAGs
 						this->textTags.add(
@@ -696,15 +872,25 @@ void Game::upgradesUpdate(const float& dt)
 								Vector2f(0.f, -1.f),
 								40, 100.f
 								, true));
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "DOUBLE RAY!",
+								Color::White,
+								Vector2f(1600.f,15.f),
+								Vector2f(-1.f, 0.f),
+								30, 75.f
+								, false));
 					}
 
 					break;
 
 				case 1: // tripleray
-					if (this->players[k].getGunLevel() < 2)
+					if (this->players[k].getGunLevel() <= 2)
 					{
 						this->players[k].setGunlevel(2);
-						this->keyTimeTripleRay = 1.f;
+						this->keyTimeTripleRay =this->keyTimeTripleRayMax-1;
+						this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
 						//TRIPLE RAY TEXT TAGs
 						this->textTags.add(
 							TextTag(
@@ -715,12 +901,21 @@ void Game::upgradesUpdate(const float& dt)
 								Vector2f(0.f, -1.f),
 								40, 100.f
 								, true));
+
+						this->textTags.add(
+							TextTag(
+								&this->font, "TRIPLE RAY!",
+								Color::White,
+								Vector2f(1600.f, 50.f),
+								Vector2f(-1.f, 0.f),
+								30, 75.f
+								, false));
 					}
 					break;
 
 				case 2: // piercing
 					this->players[k].enablePiercingShot();
-
+					this->keyTimePiercingShot=this->keyTimePiercingShotMax-1;
 					//PIERCING SHOT TEXT TAGs
 					this->textTags.add(
 						TextTag(
@@ -731,22 +926,41 @@ void Game::upgradesUpdate(const float& dt)
 							Vector2f(0.f, -1.f),
 							40, 100.f
 							, true));
+					this->textTags.add(
+						TextTag(
+							&this->font, "PIERCING SHOT!",
+							Color::White,
+							Vector2f(1600.f, 90.f),
+							Vector2f(-1.f, 0.f),
+							30, 75.f
+							, false));
 
 					break;
 
 				case 3: // shield
 					this->players[k].enableShield();
-
+					this->keyTimeShield = this->keyTimeShieldMax-1;
 					//Sheild TEXT TAGs
 					this->textTags.add(
 						TextTag(
-							&this->font, "Shield upgrade!",
+							&this->font, "INVISIBLE SHIELD!",
 							Color::Yellow,
 							Vector2f(this->players[k].getPosition().x + 20.f,
 								this->players[k].getPosition().y - 20.f),
 							Vector2f(0.f, -1.f),
 							40, 50.f
 							, true));
+
+					this->textTags.add(
+						TextTag(
+							&this->font, "INVISIBLE!",
+							Color::White,
+							Vector2f(1600.f, 120.f),
+							Vector2f(-1.f, 0.f),
+							30, 75.f
+							, false));
+
+					break;
 					break;
 
 
@@ -869,11 +1083,18 @@ void Game::Restart()
 		this->difficulty = 0;
 		this->bossEncounter = false;
 		this->enemySpawnTimerMax = 30.f;
+		this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
+		this->keyTimePiercingShot = this->keyTimePiercingShotMax;
+		this->keyTimeShield = this->keyTimeShieldMax;
+		this->keyTimeTripleRay = this->keyTimeTripleRayMax;
+
+		//clear element
 		this->enemies.clear();
 		this->upgrades.clear();
 		this->pickups.clear();
 		this->textTags.clear();
 		this->bosses.clear();
+		this->particles.clear();
 	}
 }
 
@@ -905,6 +1126,9 @@ void Game::Update(const float& dt)
 
 		//update enemies / Collison with player / out of bound
 		this->enemiesUpdate(dt);
+
+		//Particle update
+		this->particleUpdate(dt);
 
 		//text tag update
 		this->textTagsUpdate(dt);
@@ -965,6 +1189,23 @@ void Game::Draw()
 			//Ui
 			this->UpdateUIPlayer(i);
 			this->window->draw(this->followPlayerText); //UI
+			
+			this->window->draw(this->shieldBar);
+			this->window->draw(this->shieldOutline);
+			this->window->draw(this->shieldText);
+
+			this->window->draw(this->piercingShotBar);
+			this->window->draw(this->piercingOutline);
+			this->window->draw(this->piercingShotText);
+
+			this->window->draw(this->doubleRayBar);
+			this->window->draw(this->doubleRayOutline);
+			this->window->draw(this->doubleRayText);
+
+			this->window->draw(this->tripleRayBar);
+			this->window->draw(this->tripleRayOutline);
+			this->window->draw(this->tripleRayText);
+
 			this->window->draw(this->playerExpBar);
 		}
 	}
@@ -991,6 +1232,12 @@ void Game::Draw()
 	for (size_t i = 0; i < this->upgrades.size(); i++)
 	{
 		this->upgrades[i].Draw(*this->window);
+	}
+
+	//draw particles
+	for (size_t i = 0; i < this->particles.size(); i++)
+	{
+		this->particles[i].draw(*this->window);
 	}
 
 	this->DrawUI();

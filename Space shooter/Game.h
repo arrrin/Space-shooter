@@ -27,23 +27,38 @@ private:
 	float keyTimeTripleRayMax;
 	float keyTimePiercingShot;
 	float keyTimePiercingShotMax;
+	float keyTimeShield;
+	float keyTimeShieldMax;
 
 	int difficulty;
 	float difficultyTimer;
 	
 	Clock bossTimer;
 
-	//Text
+	//Texts
 	Font font;
+	Font font1;
 	Text followPlayerText;
 	Text staticPlayerText;
 	Text enemyText;
 	Text gameOverText;
 	Text scoreText;
 	Text controlsText;
+		//upgrade Texts
+		Text doubleRayText;
+		Text tripleRayText;
+		Text piercingShotText;
+		Text shieldText;
 	
 	//UI
-
+	RectangleShape shieldBar;
+	RectangleShape doubleRayBar;
+	RectangleShape tripleRayBar;
+	RectangleShape piercingShotBar;
+	RectangleShape shieldOutline;
+	RectangleShape doubleRayOutline;
+	RectangleShape tripleRayOutline;
+	RectangleShape piercingOutline;
 	RectangleShape playerExpBar; //bar
 
 	//tags
@@ -72,6 +87,9 @@ private:
 	
 	//upgrades
 	dArr<Upgrade> upgrades;
+
+	//particle
+	dArr<Particle> particles;
 
 	//player texture
 	std::vector<Texture> textures;
@@ -117,6 +135,7 @@ public:
 	void enemiesSpawnUpdate(const float &dt);
 	void playerUpdate(const float& dt);
 	void enemiesUpdate(const float& dt);
+	void particleUpdate(const float& dt);
 	void textTagsUpdate(const float& dt);
 	void upgradesUpdate(const float& dt);
 	void pickupsUpdate(const float&dt);

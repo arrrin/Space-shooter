@@ -50,11 +50,11 @@ Enemy::Enemy(dArr<Texture>& textures,
 	
 		this->sprite.setScale(Vector2f(0.125f,0.125f));
 
-		this->hpMax =(rand()%5+1 )* scalar;
+		this->hpMax =(rand()%5+2 )* scalar;
 		this->hp = this->hpMax;
 
 		this->damageMax = (rand() % 4 + 1) * scalar;
-		this->damageMin = (rand() % 1 + 1) * scalar;
+		this->damageMin = (rand() % 2 + 1) * scalar;
 
 		this->maxVelocity = rand() % 20 + 7;
 
@@ -64,11 +64,11 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->sprite.setScale(Vector2f(0.1f, 0.1f));
 
-		this->hpMax = (rand() % 3 + 1) * scalar;
+		this->hpMax = (rand() % 4 + 2) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 2 + 1) * scalar;
-		this->damageMin = (rand() % 1 + 1) * scalar;
+		this->damageMax = (rand() % 3 + 2) * scalar;
+		this->damageMin = (rand() % 2 + 1) * scalar;
 
 		this->maxVelocity = rand() % 10 + 5;
 
@@ -78,7 +78,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->sprite.setScale(Vector2f(0.13f, 0.13f));
 
-		this->hpMax = (rand() % 2 + 1) * scalar;
+		this->hpMax = (rand() % 2 +2) * scalar;
 		this->hp = this->hpMax;
 
 		this->damageMax = (rand() % 2 + 1) * scalar;

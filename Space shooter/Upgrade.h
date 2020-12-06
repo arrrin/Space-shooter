@@ -1,12 +1,5 @@
 #pragma once
-#include<SFML/Graphics.hpp>
-#include<iostream>
-#include<math.h>
-#include<vector>
-#include"dArr.h"
-#include<fstream>
-
-using namespace sf;
+#include"Particle.h"
 
 class Upgrade
 {
