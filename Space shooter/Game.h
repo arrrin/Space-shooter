@@ -20,6 +20,14 @@ private:
 	float keyTime;
 	float keyTimeMax;
 
+	//upgrades keyTime
+	float keyTimeDoubleRay;
+	float keyTimeDoubleRayMax;
+	float keyTimeTripleRay;
+	float keyTimeTripleRayMax;
+	float keyTimePiercingShot;
+	float keyTimePiercingShotMax;
+
 	int difficulty;
 	float difficultyTimer;
 	
@@ -99,6 +107,21 @@ public:
 	void initUI();
 	void UpdateUIPlayer(int index);
 	void UpdateUIEnemy(int index);
+	void updateKeytime(const float&dt);
+	void pauseUpdate();
+	void updateWhilePause(const float& dt);
+	void enemyTimerUpdate(const float&dt);
+	void upgradesTimerUpdate(const float&dt);
+	void difficultyUpdate(const float& dt);
+	void scoreUpdate(const float& dt);
+	void enemiesSpawnUpdate(const float &dt);
+	void playerUpdate(const float& dt);
+	void enemiesUpdate(const float& dt);
+	void textTagsUpdate(const float& dt);
+	void upgradesUpdate(const float& dt);
+	void pickupsUpdate(const float&dt);
+	void gameOver();
+	void Restart();
 	void Update(const float& dt);
 	void DrawUI();
 	void Draw();

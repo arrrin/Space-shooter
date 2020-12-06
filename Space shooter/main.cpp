@@ -3,15 +3,12 @@
 int main()
 {
 	srand(time(NULL));
-
 	RenderWindow window(VideoMode(1920, 1080), "Wing-man", Style::Default);
-	
 	Clock clock;
 	float dt = 0.f;
 
 	Game game(&window);
 
-	// Game loop
 	while (window.isOpen())
 	{
 		Event event;
@@ -22,11 +19,8 @@ int main()
 			if(event.type == Event::KeyPressed && event.key.code == Keyboard::X)	
 				window.close();
 		}
-
 		dt = clock.restart().asSeconds();
-
-		game.Update(dt);
-		game.Draw();
-	
+			game.Update(dt);
+			game.Draw();
 	}
 }

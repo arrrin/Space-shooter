@@ -110,6 +110,7 @@ public:
 	void gainHP(int hp);
 	void setGunlevel(int gunLevel);
 	inline void enablePiercingShot(){ this->piercingShot = true; }
+	inline void disablePiercingShot() { this->piercingShot =false; }
 	inline void enableDualMissile01() { this->dualMissiles01 = true; }
 	inline void enableDualMissile02() { this->dualMissiles02 = true; }
 	inline void enableShield() { this->shield = true; }
@@ -121,9 +122,14 @@ public:
 	inline bool getPiercingShot()const { return this->piercingShot; }
 	inline const int& getGunLevel()const { return this->mainGunLevel; }
 
+	inline void addStatPoint() { this->statPoint++; }
+	void addStatPointRandom();
+	
+
 	//function
 	void Reset();
 	bool UpdateLeveling();
+	void UpdateStats();
 	void changeAccessories(const float& dt);
 	void UpdateAccessories(const float& dt);
 	void Movement(Vector2u windowBound,const float& dt);

@@ -243,6 +243,30 @@ void Player::setGunlevel(int gunLevel)
 		std::cout << "NO TEXTURE FOR THAT MAIN GUN!" << "\n";
 }
 
+void Player::addStatPointRandom()
+{
+	int temp = rand() % 4;
+	switch (temp)
+	{
+	case 0:
+		this->power++;
+		break;
+	case 1 :
+		this->wiring++;
+		break;
+	case 2 :
+		this->cooling++;
+		break;
+	case 3:
+		this->plating++;
+		break;
+	default:
+		break;
+	}
+
+	this->UpdateStats();
+}
+
 void Player::Reset()
 {
 	this->hpMax = 10;
@@ -266,6 +290,7 @@ void Player::Reset()
 	this->currentWeapons = LASER;
 	this->statPoint = 0;
 	this->shootTimer = this->shootTimerMax;
+	this->score = 0;
 
 }
 
@@ -284,16 +309,20 @@ bool Player::UpdateLeveling()
 		this->power++;
 		this->plating++;
 
-		this->hpMax += plating * 5.f;
-		this->damageMax +=  power*2;
-		this->damage +=  power;
-
+		this->UpdateStats();
 
 		this->hp = hpMax;
 		
 		return true;
 	}
 	return false;
+}
+
+void Player::UpdateStats()
+{
+	this->hpMax += plating * 5.f;
+	this->damageMax += power * 2;
+	this->damage += power;
 }
 
 void Player::changeAccessories(const float& dt)
@@ -353,7 +382,7 @@ void Player::UpdateAccessories(const float& dt)
 	//main gun animate after firing
 	if (this->mainGunSprite.getPosition().x < this->playerCenter.x + 20)
 	{
-		this->mainGunSprite.move(2.f *dt * this->dtMultipiler + 
+		this->mainGunSprite.move(5.f *dt * this->dtMultipiler + 
 			this->currentVelo.x * dt * this->dtMultipiler, 0.f);
 	}
 	if (this->mainGunSprite.getPosition().x > this->playerCenter.x + 20)
@@ -512,8 +541,8 @@ void Player::Combat(const float& dt)
 			if (this->mainGunLevel == 0) {
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y),
-					Vector2f(0.4f, .10f),
-					70.f, 2.f,
+					Vector2f(0.4f, .1f),
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 			}
@@ -523,13 +552,13 @@ void Player::Combat(const float& dt)
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y-25),
 					Vector2f(0.4f, .10f),
-					70.f, 20.f,
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y+25),
 					Vector2f(0.4f, .10f),
-					70.f, 20.f,
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 			}
@@ -538,19 +567,19 @@ void Player::Combat(const float& dt)
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y - 40),
 					Vector2f(0.4f, .10f),
-					70.f, 20.f,
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y  ),
 					Vector2f(0.4f, .10f),
-					70.f, 20.f,
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y +40),
 					Vector2f(0.4f, .10f),
-					70.f, 20.f,
+					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f));
 			}

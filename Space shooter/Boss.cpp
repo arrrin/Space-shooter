@@ -31,7 +31,7 @@ Boss::Boss(dArr<Texture>& bodyTextures,
 			this->sprite.setPosition(position);
 		break;
 
-	case1:
+	case 1:
 		break;
 
 	default:
