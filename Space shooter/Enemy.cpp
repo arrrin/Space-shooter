@@ -86,7 +86,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->maxVelocity = rand() % 10  + 5;
 
-		this->shootTimerMax = 50.f;
+		this->shootTimerMax = 150.f;
 		this->shootTimer = 0.f;
 
 		break;
@@ -176,7 +176,7 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 		break;
 
 	case MOVELEFTSHOOT:
-		this->shootTimerMax = 50.f;
+		this->shootTimerMax = 100.f;
 		if (shootTimer < this->shootTimerMax)
 			this->shootTimer += 1.f * dt * this->dtMultipiler;
 
