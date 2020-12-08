@@ -194,72 +194,20 @@ void Game::initTextures()
 
 void Game::initUI()
 {
-		//Follow text
-		this->followPlayerText.setFont(font);
-		this->followPlayerText.setCharacterSize(15);
+	//Follow text
+	this->followPlayerText.setFont(font);
+	this->followPlayerText.setCharacterSize(15);
 
-		//static text
-		this->staticPlayerText.setFont(font);
-		this->staticPlayerText.setCharacterSize(15);
+	//static text
+	this->staticPlayerText.setFont(font);
+	this->staticPlayerText.setCharacterSize(15);
 
-			//upgrades text
-			this->doubleRayText.setFont(this->font1);
-			this->doubleRayText.setCharacterSize(15);
-			this->doubleRayText.setFillColor(Color::Black);
-			this->doubleRayText.setString("DOUBLE RAY");
-			this->doubleRayText.setPosition(1700.f, 20.f);
+	//upgrades text
+	this->initUpgradesUI();
 
-			this->tripleRayText.setFont(this->font1);
-			this->tripleRayText.setCharacterSize(15);
-			this->tripleRayText.setFillColor(Color::Black);
-			this->tripleRayText.setString("TRIPLE RAY");
-			this->tripleRayText.setPosition(1700.f, 60.f);
-
-			this->piercingShotText.setFont(this->font1);
-			this->piercingShotText.setCharacterSize(15);
-			this->piercingShotText.setFillColor(Color::Black);
-			this->piercingShotText.setString("PIERCING SHOT");
-			this->piercingShotText.setPosition(1700.f, 100.f);
-
-			this->shieldText.setFont(this->font1);
-			this->shieldText.setCharacterSize(15);
-			this->shieldText.setFillColor(Color::Black);
-			this->shieldText.setString("INVISIBLE");
-			this->shieldText.setPosition(1700.f, 140.f);
-
-		//Exp bar
+	//Exp bar
 	this->playerExpBar.setSize(Vector2f(90.f, 10.f));
 	this->playerExpBar.setFillColor(Color(0.f, 90.f, 200.f, 200.f));
-
-	//upgrades bar
-	this->shieldBar.setSize(Vector2f(200.f, 20.f));
-	this->shieldBar.setFillColor(Color::Cyan);
-		this->shieldOutline.setSize(Vector2f(200.f, 20.f));
-		this->shieldOutline.setOutlineThickness(2);
-		this->shieldOutline.setFillColor(Color(100, 100, 100, 0));
-		this->shieldOutline.setOutlineColor(Color::White);
-
-	this->doubleRayBar.setSize(Vector2f(200.f, 20.f));
-	this->doubleRayBar.setFillColor(Color::Magenta);
-		this->doubleRayOutline.setSize(Vector2f(200.f, 20.f));
-		this->doubleRayOutline.setOutlineThickness(2);
-		this->doubleRayOutline.setFillColor(Color(100, 100, 100, 0));
-		this->doubleRayOutline.setOutlineColor(Color::White);
-
-	this->tripleRayBar.setSize(Vector2f(200.f, 20.f));
-	this->tripleRayBar.setFillColor(Color::Red);
-		this->tripleRayOutline.setSize(Vector2f(200.f, 20.f));
-		this->tripleRayOutline.setOutlineThickness(2);
-		this->tripleRayOutline.setFillColor(Color(100, 100, 100, 0));
-		this->tripleRayOutline.setOutlineColor(Color::White);
-
-	this->piercingShotBar.setSize(Vector2f(200.f, 20.f));
-	this->piercingShotBar.setFillColor(Color::Yellow);
-		this->piercingOutline.setSize(Vector2f(200.f, 20.f));
-		this->piercingOutline.setOutlineThickness(2);
-		this->piercingOutline.setFillColor(Color(100, 100, 100, 0));
-		this->piercingOutline.setOutlineColor(Color::White);
-
 
 	this->enemyText.setFont(this->font);
 	this->enemyText.setCharacterSize(14);
@@ -277,16 +225,69 @@ void Game::initUI()
 	this->scoreText.setPosition(10.f,10.f);
 
 	this->controlsText.setFont(this->font);
-
 	this->controlsText.setCharacterSize(40);
 	this->controlsText.setString(
 		(std::string("Controls\nW,A,S,D : Movement\nSpace bar : Shoot\nEsc : Pause&Resume\nX : Exit game" 
 		)
 			));
 	this->controlsText.setPosition(10.f, 700.f);
+}
 
-	
+void Game::initUpgradesUI()
+{
+	//text
+	this->doubleRayText.setFont(this->font1);
+	this->doubleRayText.setCharacterSize(15);
+	this->doubleRayText.setFillColor(Color::Black);
+	this->doubleRayText.setString("DOUBLE RAY");
+	this->doubleRayText.setPosition(1700.f, 20.f);
 
+	this->tripleRayText.setFont(this->font1);
+	this->tripleRayText.setCharacterSize(15);
+	this->tripleRayText.setFillColor(Color::Black);
+	this->tripleRayText.setString("TRIPLE RAY");
+	this->tripleRayText.setPosition(1700.f, 60.f);
+
+	this->piercingShotText.setFont(this->font1);
+	this->piercingShotText.setCharacterSize(15);
+	this->piercingShotText.setFillColor(Color::Black);
+	this->piercingShotText.setString("PIERCING SHOT");
+	this->piercingShotText.setPosition(1700.f, 100.f);
+
+	this->shieldText.setFont(this->font1);
+	this->shieldText.setCharacterSize(15);
+	this->shieldText.setFillColor(Color::Black);
+	this->shieldText.setString("INVISIBLE");
+	this->shieldText.setPosition(1700.f, 140.f);
+
+	//bar
+	this->shieldBar.setSize(Vector2f(200.f, 20.f));
+	this->shieldBar.setFillColor(Color::Cyan);
+	this->shieldOutline.setSize(Vector2f(200.f, 20.f));
+	this->shieldOutline.setOutlineThickness(2);
+	this->shieldOutline.setFillColor(Color(100, 100, 100, 0));
+	this->shieldOutline.setOutlineColor(Color::White);
+
+	this->doubleRayBar.setSize(Vector2f(200.f, 20.f));
+	this->doubleRayBar.setFillColor(Color::Magenta);
+	this->doubleRayOutline.setSize(Vector2f(200.f, 20.f));
+	this->doubleRayOutline.setOutlineThickness(2);
+	this->doubleRayOutline.setFillColor(Color(100, 100, 100, 0));
+	this->doubleRayOutline.setOutlineColor(Color::White);
+
+	this->tripleRayBar.setSize(Vector2f(200.f, 20.f));
+	this->tripleRayBar.setFillColor(Color::Red);
+	this->tripleRayOutline.setSize(Vector2f(200.f, 20.f));
+	this->tripleRayOutline.setOutlineThickness(2);
+	this->tripleRayOutline.setFillColor(Color(100, 100, 100, 0));
+	this->tripleRayOutline.setOutlineColor(Color::White);
+
+	this->piercingShotBar.setSize(Vector2f(200.f, 20.f));
+	this->piercingShotBar.setFillColor(Color::Yellow);
+	this->piercingOutline.setSize(Vector2f(200.f, 20.f));
+	this->piercingOutline.setOutlineThickness(2);
+	this->piercingOutline.setFillColor(Color(100, 100, 100, 0));
+	this->piercingOutline.setOutlineColor(Color::White);
 }
 
 void Game::UpdateUIPlayer(int index)
@@ -681,7 +682,7 @@ void Game::playerUpdate(const float& dt)
 							{
 								dropChange = rand() % 100 + 1;
 
-								if (dropChange < 90)
+								if (dropChange > 90)
 								{
 									this->upgrades.add(Upgrade(
 										this->upgradeTextures,

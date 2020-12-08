@@ -38,7 +38,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 	this->damagetimerMax = 6.f;
 	this->damageTimer = 0;
 	
-	this->shootTimerMax = 50.f;
+	this->shootTimerMax = 100.f;
 	this->shootTimer = this->shootTimerMax;
 
 	this->moveDirection = moveDirection;
@@ -50,13 +50,13 @@ Enemy::Enemy(dArr<Texture>& textures,
 	
 		this->sprite.setScale(Vector2f(0.125f,0.125f));
 
-		this->hpMax =(rand()%5+2 )* scalar;
+		this->hpMax = (rand() % 5 + (3*scalar)) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 4 + 1) * scalar;
-		this->damageMin = (rand() % 2 + 1) * scalar;
+		this->damageMax = (rand() % 5 + (2 * scalar)) * scalar;
+		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar; ;
 
-		this->maxVelocity = rand() % 20 + 7;
+		this->maxVelocity = rand() % 20 + 7 ;
 
 		break;
 
@@ -64,13 +64,13 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->sprite.setScale(Vector2f(0.1f, 0.1f));
 
-		this->hpMax = (rand() % 4 + 2) * scalar;
+		this->hpMax = (rand() % 4 + (2 * scalar)) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 3 + 2) * scalar;
-		this->damageMin = (rand() % 2 + 1) * scalar;
+		this->damageMax = (rand() % 2 + (1 * scalar)) * scalar;
+		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar;
 
-		this->maxVelocity = rand() % 10 + 5;
+		this->maxVelocity = rand() % 7 + 5;
 
 		break;
 
@@ -78,13 +78,13 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->sprite.setScale(Vector2f(0.13f, 0.13f));
 
-		this->hpMax = (rand() % 2 +2) * scalar;
+		this->hpMax = (rand() % 3 + (1 * scalar)) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 2 + 1) * scalar;
-		this->damageMin = (rand() % 1 + 1) * scalar;
+		this->damageMax = (rand() % 3 + (1 * scalar)) * scalar;
+		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar;
 
-		this->maxVelocity = rand() % 15 + 5;
+		this->maxVelocity = rand() % 10  + 5;
 
 		this->shootTimerMax = 50.f;
 		this->shootTimer = 0.f;

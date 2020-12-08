@@ -123,6 +123,7 @@ public:
 	//function
 	void initTextures();
 	void initUI();
+	void initUpgradesUI();
 	void UpdateUIPlayer(int index);
 	void UpdateUIEnemy(int index);
 	void updateKeytime(const float&dt);

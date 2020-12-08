@@ -195,7 +195,6 @@ int Player::getDamage()const
 	{
 	case LASER:
 		damage = rand() % this->damageMax + this->damage;
-
 		break;
 
 	case MISSILE01:
