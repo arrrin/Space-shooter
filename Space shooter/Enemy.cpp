@@ -2,7 +2,8 @@
 
 enum eTypes { MOVELEFT = 0, FOLLOW,MOVELEFTSHOOT,FOLLOWFAST, FOLLOWSHOOT };
 enum bulletType { BULLET=0, MISSILE};
-
+//
+dArr<Bullet> Enemy::enemyBullets;
 
 Enemy::Enemy(dArr<Texture>& textures,
 	dArr<Texture>& bulletTextures,
@@ -50,10 +51,10 @@ Enemy::Enemy(dArr<Texture>& textures,
 	
 		this->sprite.setScale(Vector2f(0.125f,0.125f));
 
-		this->hpMax = (rand() % 5 + (3*scalar)) * scalar;
+		this->hpMax = (rand() % 5 +1 ) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 5 + (2 * scalar)) * scalar;
+		this->damageMax = (rand() % 3 + (2 * scalar)) * scalar;
 		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar; ;
 
 		this->maxVelocity = rand() % 20 + 7 ;
@@ -64,7 +65,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->sprite.setScale(Vector2f(0.1f, 0.1f));
 
-		this->hpMax = (rand() % 4 + (2 * scalar)) * scalar;
+		this->hpMax = (rand() % 3 + 1) * scalar;
 		this->hp = this->hpMax;
 
 		this->damageMax = (rand() % 2 + (1 * scalar)) * scalar;
@@ -81,7 +82,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 		this->hpMax = (rand() % 3 + (1 * scalar)) * scalar;
 		this->hp = this->hpMax;
 
-		this->damageMax = (rand() % 3 + (1 * scalar)) * scalar;
+		this->damageMax = (rand() % 2 + (1 * scalar)) * scalar;
 		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar;
 
 		this->maxVelocity = rand() % 10  + 5;
@@ -176,7 +177,7 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 		break;
 
 	case MOVELEFTSHOOT:
-		this->shootTimerMax = 100.f;
+		this->shootTimerMax = 150.f;
 		if (shootTimer < this->shootTimerMax)
 			this->shootTimer += 1.f * dt * this->dtMultipiler;
 
@@ -197,13 +198,14 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 		//enemy shoot
 		if (this->shootTimer >= this->shootTimerMax)
 		{
-			this->bullets.add(
+			this->enemyBullets.add(
 				Bullet(&(*this->bulletTextures)[BULLET],
 					Vector2f(this->sprite.getPosition()),
 					Vector2f(0.2f, .2f),
 					5.f, 2.0f,
 					this->normalizedLookDir,
-					.5f));
+					.5f, 
+					this->getDamage()));
 			this->shootTimer = 0.f;
 		}
 

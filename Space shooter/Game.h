@@ -16,7 +16,16 @@ private:
 	int multiplierAdderMax;
 	
 	bool paused;
+	bool isMusicPlay;
 
+	//score function
+	FILE* fp;
+	char temp[255];
+	int Lscore[6];
+	std::string name[6];
+	std::vector<int> userScore;
+	bool canHighScoreGet;
+	bool fullscreen;
 	float keyTime;
 	float keyTimeMax;
 
@@ -29,6 +38,8 @@ private:
 	float keyTimePiercingShotMax;
 	float keyTimeShield;
 	float keyTimeShieldMax;
+	float keyTimeMachineGun;
+	float keyTimeMachineGunMax;
 
 	int difficulty;
 	float difficultyTimer;
@@ -38,12 +49,16 @@ private:
 	//Texts
 	Font font;
 	Font font1;
+	Font font2;
+
+	Text nameOfGame;
 	Text followPlayerText;
 	Text staticPlayerText;
 	Text enemyText;
 	Text gameOverText;
 	Text scoreText;
 	Text controlsText;
+	Text playerStatsText;
 		//upgrade Texts
 		Text doubleRayText;
 		Text tripleRayText;
@@ -60,6 +75,11 @@ private:
 	RectangleShape tripleRayOutline;
 	RectangleShape piercingOutline;
 	RectangleShape playerExpBar; //bar
+	RectangleShape playerStatsTextBack;
+
+	//sound
+	Music music;
+
 
 	//tags
 	dArr<TextTag> textTags;
@@ -122,8 +142,11 @@ public:
 
 	//function
 	void initTextures();
+	void initSound();
+	void initFont();
 	void initUI();
 	void initUpgradesUI();
+	void toggleFullscreen();
 	void UpdateUIPlayer(int index);
 	void UpdateUIEnemy(int index);
 	void updateKeytime(const float&dt);
@@ -133,8 +156,10 @@ public:
 	void upgradesTimerUpdate(const float&dt);
 	void difficultyUpdate(const float& dt);
 	void scoreUpdate(const float& dt);
+	void highScore();
 	void enemiesSpawnUpdate(const float &dt);
 	void playerUpdate(const float& dt);
+	void enemyBulletUpdate(const float &dt);
 	void enemiesUpdate(const float& dt);
 	void particleUpdate(const float& dt);
 	void textTagsUpdate(const float& dt);

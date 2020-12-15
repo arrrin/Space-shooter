@@ -27,12 +27,17 @@ Game::Game(RenderWindow *window)
 	this->keyTimeShieldMax = 401.f;
 	this->keyTimeShield = this->keyTimeShieldMax;
 
-	this->paused = false;
+	this->keyTimeMachineGunMax = 501.f;
+	this->keyTimeMachineGun = this->keyTimeMachineGunMax;
+
+	this->keyTimeMax = 10.f;
+	this->keyTime = this->keyTimeMax;
+	this->paused = true;
+	this->isMusicPlay = true;
+	this->canHighScoreGet = false;
 	
-	//init font
-	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
-	this->font1.loadFromFile("Fonts/ethnocentric.ttf");
-	
+	/*this->canGetHighScore = false;*/
+
 	//init texture
 	this->initTextures();
 	
@@ -49,7 +54,7 @@ Game::Game(RenderWindow *window)
 
 	this->playersAlive = this->players.size();	
 
-	this->enemySpawnTimerMax = 30;
+	this->enemySpawnTimerMax = 40;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
 
 	//Init boss
@@ -101,6 +106,9 @@ void Game::initTextures()
 	this->upgradeTextures.add(Texture(temp));
 	temp.loadFromFile("Textures/Upgrades/statpoint.png");
 	this->upgradeTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/Upgrades/powerupRF.png");
+	this->upgradeTextures.add(Texture(temp));
+
 
 	//enemies
 
@@ -192,8 +200,42 @@ void Game::initTextures()
 
 }
 
+void Game::initSound()
+{
+	this->music.openFromFile("Musics/mainGameSong.wav");
+
+	if (!this->music.openFromFile("Musics/mainGameSong.wav"))
+	{
+		std::cout << "Error Cannot load Musc!!" << "\n";
+	}
+	//if (isMusicPlay==true)
+	//{
+	//	music.play();
+	//	isMusicPlay = false;
+	//	std::cout << "Play Music!!" << "\n";
+	//}
+	
+}
+
+void Game::initFont()
+{
+	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
+	this->font1.loadFromFile("Fonts/ethnocentric.ttf");
+	this->font2.loadFromFile("Fonts/airstrikeb3d.ttf");
+}
+
 void Game::initUI()
 {
+	//Font
+	this->initFont();
+
+	//Main game name text
+	this->nameOfGame.setFont(font2);
+	this->nameOfGame.setCharacterSize(80);
+	this->nameOfGame.setFillColor(Color::White);
+	this->nameOfGame.setString("AIR STRIKE");
+	this->nameOfGame.setPosition(1350.f, 5.f);
+
 	//Follow text
 	this->followPlayerText.setFont(font);
 	this->followPlayerText.setCharacterSize(15);
@@ -231,6 +273,15 @@ void Game::initUI()
 		)
 			));
 	this->controlsText.setPosition(10.f, 700.f);
+
+	this->playerStatsText.setFont(font);
+	this->playerStatsText.setFillColor(Color::White);
+	this->playerStatsText.setCharacterSize(16);
+	this->playerStatsText.setString("NONE");
+
+	this->playerStatsTextBack.setFillColor(Color(50, 50, 50, 100));
+	this->playerStatsTextBack.setOutlineThickness(1.f);
+	this->playerStatsTextBack.setOutlineColor(Color(255, 255, 255, 200));
 }
 
 void Game::initUpgradesUI()
@@ -288,6 +339,27 @@ void Game::initUpgradesUI()
 	this->piercingOutline.setOutlineThickness(2);
 	this->piercingOutline.setFillColor(Color(100, 100, 100, 0));
 	this->piercingOutline.setOutlineColor(Color::White);
+}
+
+void Game::toggleFullscreen()
+{
+	if (Keyboard::isKeyPressed(Keyboard::F11) && this->keyTime >= this->keyTimeMax)
+	{
+		this->keyTime = 0.f;
+
+		if (fullscreen)
+		{
+			this->fullscreen = false;
+			this->window->close();
+			this->window->create(sf::VideoMode(1920, 1080), "Wingman Game", Style::Default);
+		}
+		else
+		{
+			this->fullscreen = true;
+			this->window->close();
+			this->window->create(sf::VideoMode(1920, 1080), "Wingman Game", Style::Fullscreen);
+		}
+	}
 }
 
 void Game::UpdateUIPlayer(int index)
@@ -378,6 +450,22 @@ void Game::UpdateUIPlayer(int index)
 		{
 			this->piercingShotBar.setFillColor(Color::Yellow);
 		}
+
+		//stat text
+		//STATS BOX WITH TEXT
+		if (this->players[index].playerShowStatsIsPressed())
+		{
+			this->playerStatsText.setString(this->players[index].getStatsAsString());
+
+			this->playerStatsTextBack.setPosition(
+				this->players[index].getPosition().x,
+				this->players[index].getPosition().y + 150.f
+			);
+			this->playerStatsTextBack.setSize(Vector2f(this->playerStatsText.getGlobalBounds().width, this->playerStatsText.getGlobalBounds().height));
+
+			this->playerStatsText.setPosition(this->playerStatsTextBack.getPosition());
+		}
+
 }
 
 void Game::UpdateUIEnemy(int index)
@@ -496,6 +584,20 @@ void Game::upgradesTimerUpdate(const float& dt)
 		}
 		std::cout << "Shield left : " << keyTimeShield << "\n";
 	}
+	//machinegun keytime
+	if (this->keyTimeMachineGun < this->keyTimeMachineGun)
+	{
+		this->keyTimeMachineGun -= 1.f * dt * this->dtMultiplier;
+		if (this->keyTimeMachineGun <= 1.f)
+		{
+			this->keyTimeMachineGun = this->keyTimeMachineGunMax;
+			for (size_t i = 0; i < players.size(); i++)
+			{
+				this->players[i].disableMachineGun();
+			}
+		}
+		std::cout << "Machine gun left : " << keyTimeMachineGun << "\n";
+	}
 }
 
 void Game::difficultyUpdate(const float& dt)
@@ -530,6 +632,23 @@ void Game::scoreUpdate(const float& dt)
 		this->multiplierAdder = 0;
 		this->scoreMultiplier++;
 	}
+}
+
+void Game::highScore()
+{
+	//fp = fopen("./highScore.txt", "r");
+	//for (int i = 0; i < 1; i++)
+	//{
+	//	fscanf(fp, "%d", &this->Lscore[i]);
+	//	this->userScore.push_back(this->Lscore[i]);
+	//}
+	//std::sort(this->userScore.begin(), this->userScore.end());
+	//fclose(fp);
+
+	//fopen("./highScore.txt", "w");
+	//
+	//	fprintf(fp, "%d\n", this->userScore[1]);
+	//fclose(fp);
 }
 
 void Game::enemiesSpawnUpdate(const float& dt)
@@ -682,7 +801,7 @@ void Game::playerUpdate(const float& dt)
 							{
 								dropChange = rand() % 100 + 1;
 
-								if (dropChange > 90)
+								if (dropChange > 80)
 								{
 									this->upgrades.add(Upgrade(
 										this->upgradeTextures,
@@ -745,6 +864,22 @@ void Game::playerUpdate(const float& dt)
 		for (size_t k = 0; k < players.size(); k++)
 		{
 			this->score += players[k].getScore();
+
+			/*fp = fopen("./highScore.txt", "r");
+			for (size_t i = 0; i < userScore.size(); i++)
+			{
+				fscanf(fp, "%d", &userScore[i]);
+				userScore.push_back(this->Lscore[i]);
+			}
+			for (size_t i = 0; i < userScore.size(); i++)
+			{
+				if (this->score >= userScore[i])
+				{
+					canHighScoreGet = true;
+				}
+			}
+			
+			fclose(fp);*/
 		}
 
 		this->scoreText.setString(
@@ -759,6 +894,90 @@ void Game::playerUpdate(const float& dt)
 		);
 
 	}
+}
+
+void Game::enemyBulletUpdate(const float& dt)
+{
+		//Enemy bullet update
+		bool bulletRemoved = false;
+		bool playerKilled = false;
+	
+		for (size_t i = 0; i < Enemy::enemyBullets.size() && !bulletRemoved; i++)
+		{
+			Enemy::enemyBullets[i].Update(dt);
+			//Player collision check
+			for (size_t k = 0; k < this->players.size() && !playerKilled; k++)
+			{
+				if (Enemy::enemyBullets[i].getGlobalBounds().intersects(this->players[k].getGlobalBounds())
+					&& this->players[k].isAlive())
+				{
+					int damage = Enemy::enemyBullets[i].getDamage();
+					std::cout << "collision check" << std::endl;
+					//PLAYER TAKES BULLET DAMAGE
+					if (!this->players[k].getShield())
+					{
+						this->players[k].takeDamage(damage);
+
+						//PLAYER TAKE DAMAGE TAG
+						this->textTags.add(
+							TextTag(&this->font,
+								"-" + std::to_string(damage),
+								Color::Red,
+								Vector2f(this->players[k].getPosition().x + 20.f,
+									this->players[k].getPosition().y - 20.f),
+								Vector2f(-1.f, 0.f),
+								30,
+								30.f,
+								true
+							)
+						);
+
+						//Player death
+						if (!this->players[k].isAlive())
+							playerKilled = true;
+					}
+					else
+					{
+						//Add particles on shielding
+						int nrOfPart = rand() % 5 + 3;
+						for (size_t l = 0; l < nrOfPart; l++)
+						{
+							this->particles.add(Particle(
+								Enemy::enemyBullets[i].getPosition(),
+								0,
+								Enemy::enemyBullets[i].getVel(),
+								rand() % 20 + 5,
+								rand() % 20,
+								30.f,
+								Color(0, 50, 255, 255)
+							));
+						}
+
+						//PLAYER SHIELDED TAG
+						this->textTags.add(
+							TextTag(&this->font,
+								"-" + std::to_string(0),
+								Color::Cyan,
+								Vector2f(this->players[k].getPosition().x + 20.f,
+									this->players[k].getPosition().y - 20.f),
+								Vector2f(-1.f, 0.f),
+								30,
+								30.f,
+								true
+							)
+						);
+					}
+
+					bulletRemoved = true;
+				}
+
+				if (playerKilled)
+					this->playersAlive--;
+			}
+			
+			if (bulletRemoved)
+				Enemy::enemyBullets.remove(i);
+		}
 }
 
 void Game::enemiesUpdate(const float& dt)
@@ -814,7 +1033,10 @@ void Game::enemiesUpdate(const float& dt)
 			this->enemies.remove(i);
 			return;
 		}
+
 	}
+
+	this->enemyBulletUpdate(dt);
 }
 
 void Game::particleUpdate(const float& dt)
@@ -962,7 +1184,6 @@ void Game::upgradesUpdate(const float& dt)
 							, false));
 
 					break;
-					break;
 
 
 				case 4: // healthtank
@@ -987,6 +1208,21 @@ void Game::upgradesUpdate(const float& dt)
 					this->textTags.add(
 						TextTag(
 							&this->font, "Stat point INCREASE!",
+							Color(255, 165, 0),
+							Vector2f(this->players[k].getPosition().x + 20.f,
+								this->players[k].getPosition().y - 20.f),
+							Vector2f(0.f, -1.f),
+							40, 45.f
+							, true));
+					break;
+
+				case 6: // Laser maching gun
+					this->players[k].enableMachineGun();
+
+					this->keyTimeMachineGun - 1.f;
+					this->textTags.add(
+						TextTag(
+							&this->font, "Laser Machine Gun!",
 							Color(255, 165, 0),
 							Vector2f(this->players[k].getPosition().x + 20.f,
 								this->players[k].getPosition().y - 20.f),
@@ -1055,6 +1291,7 @@ void Game::pickupsUpdate(const float& dt)
 
 void Game::gameOver()
 {
+
 	this->enemies.clear();
 	this->upgrades.clear();
 	this->pickups.clear();
@@ -1101,9 +1338,14 @@ void Game::Restart()
 
 void Game::Update(const float& dt)
 {
+	/*this->initSound();*/
+
 	this->updateKeytime(dt);
 	
 	this->pauseUpdate();
+	
+	//fullscreen
+	this->toggleFullscreen();
 
 	//Can do while pause 
 	this->updateWhilePause(dt);
@@ -1127,6 +1369,8 @@ void Game::Update(const float& dt)
 
 		//update enemies / Collison with player / out of bound
 		this->enemiesUpdate(dt);
+
+		
 
 		//Particle update
 		this->particleUpdate(dt);
@@ -1152,19 +1396,25 @@ void Game::Update(const float& dt)
 
 void Game::DrawUI()
 {
-
-	//draw text tag
-	for (size_t i = 0; i < this->textTags.size(); i++)
+	if (this->paused)
 	{
-		this->textTags[i].Draw(*this->window);
+		this->window->draw(this->nameOfGame);
 	}
 
+	if (!this->paused)
+	{
+		//draw text tag
+		for (size_t i = 0; i < this->textTags.size(); i++)
+		{
+			this->textTags[i].Draw(*this->window);
+		}
+	}
 	// over text!!
 	if (this->playersAlive <= 0)
 	{
 		this->window->draw(this->gameOverText);
 	}
-
+	
 	//score
 	this->window->draw(this->scoreText);
 
@@ -1180,68 +1430,80 @@ void Game::Draw()
 	this->window->clear();
 	this->window->draw(this->map);
 	//draw player
-	for (size_t i = 0; i < this->players.size(); i++)
-	{
-		if (this->players[i].isAlive())
+	if (!this->paused) {
+		for (size_t i = 0; i < this->players.size(); i++)
 		{
-				
-			this->players[i].Draw(*this->window);
+			if (this->players[i].isAlive())
+			{
+
+				//Ui
+				this->UpdateUIPlayer(i);
+				this->players[i].Draw(*this->window);
+				this->window->draw(this->followPlayerText); //UI
+
+				this->window->draw(this->shieldBar);
+				this->window->draw(this->shieldOutline);
+				this->window->draw(this->shieldText);
+
+				this->window->draw(this->piercingShotBar);
+				this->window->draw(this->piercingOutline);
+				this->window->draw(this->piercingShotText);
+
+				this->window->draw(this->doubleRayBar);
+				this->window->draw(this->doubleRayOutline);
+				this->window->draw(this->doubleRayText);
+
+				this->window->draw(this->tripleRayBar);
+				this->window->draw(this->tripleRayOutline);
+				this->window->draw(this->tripleRayText);
+
+				this->window->draw(this->playerExpBar);
+				if (this->players[i].playerShowStatsIsPressed())
+				{
+					this->window->draw(this->playerStatsTextBack);
+					this->window->draw(this->playerStatsText);
+				}
+			}
+		}
+
+		//draw enemy
+		for (size_t i = 0; i < this->enemies.size(); i++)
+		{
+
+			this->enemies[i].draw(*this->window);
 
 			//Ui
-			this->UpdateUIPlayer(i);
-			this->window->draw(this->followPlayerText); //UI
-			
-			this->window->draw(this->shieldBar);
-			this->window->draw(this->shieldOutline);
-			this->window->draw(this->shieldText);
-
-			this->window->draw(this->piercingShotBar);
-			this->window->draw(this->piercingOutline);
-			this->window->draw(this->piercingShotText);
-
-			this->window->draw(this->doubleRayBar);
-			this->window->draw(this->doubleRayOutline);
-			this->window->draw(this->doubleRayText);
-
-			this->window->draw(this->tripleRayBar);
-			this->window->draw(this->tripleRayOutline);
-			this->window->draw(this->tripleRayText);
-
-			this->window->draw(this->playerExpBar);
+			this->UpdateUIEnemy(i);
+			this->window->draw(this->enemyText);
 		}
-	}
 
-	//draw enemy
-	for (size_t i = 0; i < this->enemies.size(); i++)
-	{
+		for (size_t i = 0; i < Enemy::enemyBullets.size(); i++)
+		{
+			Enemy::enemyBullets[i].Draw(*this->window);
+		}
 
-		this->enemies[i].draw(*this->window);
+		//draw pickups
+		for (size_t i = 0; i < this->pickups.size(); i++)
+		{
+			this->pickups[i].Draw(*this->window);
 
-		//Ui
-		this->UpdateUIEnemy(i);
-		this->window->draw(this->enemyText);
-	}
+		}
 
-	//draw pickups
-	for (size_t i = 0; i <this->pickups.size(); i++)
-	{
-		this->pickups[i].Draw(*this->window);
+		//draw upgrade
+		for (size_t i = 0; i < this->upgrades.size(); i++)
+		{
+			this->upgrades[i].Draw(*this->window);
+		}
 
-	}
-
-	//draw upgrade
-	for (size_t i = 0; i < this->upgrades.size(); i++)
-	{
-		this->upgrades[i].Draw(*this->window);
-	}
-
-	//draw particles
-	for (size_t i = 0; i < this->particles.size(); i++)
-	{
-		this->particles[i].draw(*this->window);
+		//draw particles
+		for (size_t i = 0; i < this->particles.size(); i++)
+		{
+			this->particles[i].draw(*this->window);
+		}
 	}
 
 	this->DrawUI();
 
 	this->window->display();
 }
+

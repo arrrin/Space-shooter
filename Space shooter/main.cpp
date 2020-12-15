@@ -3,9 +3,14 @@
 int main()
 {
 	srand(time(NULL));
-	RenderWindow window(VideoMode(1920, 1080), "Wing-man", Style::Default);
+	RenderWindow window(VideoMode(1920, 1080), "AIRSTRIKE", Style::Default);
 	Clock clock;
 	float dt = 0.f;
+	Music music;
+	//music.openFromFile("Musics/mainGameSong.wav");
+	//music.setVolume(5.f);
+	//music.play();
+	//music.setLoop(true);
 
 	Game game(&window);
 
@@ -17,9 +22,10 @@ int main()
 			if (event.type == Event::Closed)			
 				window.close();			
 			if(event.type == Event::KeyPressed && event.key.code == Keyboard::X)	
-				window.close();
+				window.close(); 
 		}
 		dt = clock.restart().asSeconds();
+			
 			game.Update(dt);
 			game.Draw();
 	}

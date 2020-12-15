@@ -19,6 +19,7 @@ private:
 	dArr<Texture>* bulletTextures;
 	dArr<Bullet> bullets;
 
+
 	float damagetimerMax;
 	float damageTimer;
 
@@ -60,6 +61,8 @@ public:
 	void Update(const float& dt,Vector2f playerPosition);
 	void draw(RenderTarget &target);
 
+
+	static dArr<Bullet> enemyBullets;
 
 	float vectorLength(Vector2f v)
 	{

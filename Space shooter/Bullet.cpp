@@ -2,7 +2,7 @@
 
 Bullet::Bullet(Texture *texture,Vector2f position,
 	Vector2f scale,
-	float MaxVelo , float initialVelo, Vector2f direction, float acceleration )
+	float MaxVelo , float initialVelo, Vector2f direction, float acceleration,int damage )
 {
 	this->dtMultiplier = 60.f;
 
@@ -16,7 +16,7 @@ Bullet::Bullet(Texture *texture,Vector2f position,
 		initialVelo * this->direction.y
 		);
 
-
+	this->damage = damage;
 
 	this->sprite.setOrigin(
 		this->sprite.getGlobalBounds().width / 2,

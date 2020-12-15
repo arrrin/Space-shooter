@@ -35,6 +35,11 @@ private:
 	Sprite cPit;
 	Sprite aura;
 
+	//sound
+	Sound laserSound;
+	SoundBuffer laserSoundBuffer;
+
+
 	int lWingSelect;
 	int rWingSelect;
 	int cPitSelect;
@@ -63,7 +68,7 @@ private:
 
 	int damage;
 	int damageMax;
-
+	
 	int score;
 
 	int currentWeapons;
@@ -74,6 +79,7 @@ private:
 	bool shield;
 	bool dualMissiles01;
 	bool dualMissiles02;
+	bool machineGun;
 
 
 public:
@@ -124,11 +130,21 @@ public:
 	inline bool getShield()const { return this->shield; }
 	inline const int& getGunLevel()const { return this->mainGunLevel; }
 
+	inline const float getShootTimerMax()const { return this->shootTimerMax; }
+	inline const float getShootTimer()const { return this->shootTimer; }
+	inline void  enableMachineGun() { this->machineGun = true; }
+	inline void  disableMachineGun() { this->machineGun = false; }
+	inline bool getMachineGun()const { return this->machineGun; }
+
 	inline void addStatPoint() { this->statPoint++; }
 	void addStatPointRandom();
 	
+	
+	bool playerShowStatsIsPressed();
+	std::string getStatsAsString()const;
 
 	//function
+	void initSound();
 	void Reset();
 	bool UpdateLeveling();
 	void UpdateStats();

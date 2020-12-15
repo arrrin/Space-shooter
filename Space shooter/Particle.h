@@ -1,11 +1,16 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include<SFML/Graphics.hpp>
 #include<SFML/Audio.hpp>
 #include<iostream>
 #include<math.h>
 #include<vector>
 #include"dArr.h"
+#include<utility>
+#include<algorithm>
 #include<fstream>
+#include<string>
+#include<stdio.h>
 
 using namespace sf;
 class Particle

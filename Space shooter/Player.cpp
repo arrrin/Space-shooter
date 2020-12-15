@@ -266,6 +266,41 @@ void Player::addStatPointRandom()
 	this->UpdateStats();
 }
 
+bool Player::playerShowStatsIsPressed()
+{
+	if (Keyboard::isKeyPressed(Keyboard::Key::Tab))
+		return true;
+
+	return false;
+}
+
+std::string Player::getStatsAsString() const
+{
+	return
+		"Level: " + std::to_string(this->level) +
+		"\nExp: " + std::to_string(this->exp) + " / " + std::to_string(this->expNext) +
+		"\nStatpoints: " + std::to_string(this->statPoint) +
+		"\nHP: " + std::to_string(this->hp) + " / " + std::to_string(this->hpMax) + 
+		"\nDamage: " + std::to_string(this->damage) + " - " + std::to_string(this->damageMax) +
+		"\n\nScore: " + std::to_string(this->score) +
+		"\n\nPower: " + std::to_string(this->power) +
+		"\nPlating: " + std::to_string(this->plating) +
+		"\nWiring: " + std::to_string(this->wiring) +
+		"\nCooling: " + std::to_string(this->cooling);
+		
+}
+
+void Player::initSound()
+{
+	this->laserSoundBuffer.loadFromFile("Sounds/Laser.wav");
+	if (!laserSoundBuffer.loadFromFile("Sounds/laser9.wav"))
+	{
+		std::cout<<"Error loading sound effect !"<<"\n";
+	}
+	this->laserSound.setBuffer(laserSoundBuffer);
+	
+}
+
 void Player::Reset()
 {
 	this->hpMax = 10;
@@ -535,8 +570,10 @@ void Player::Combat(const float& dt)
 	if (Keyboard::isKeyPressed(Keyboard::Key(this->controls[controls::shoot]))
 		&& this->shootTimer >= this->shootTimerMax)
 	{
+		/*laserSound.play();*/
 		if (this->currentWeapons == LASER)
 		{
+			
 			//create bullet
 			if (this->mainGunLevel == 0) {
 				this->bullets.add(Bullet(laserTexture,
@@ -544,7 +581,7 @@ void Player::Combat(const float& dt)
 					Vector2f(0.4f, .1f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f,this->getDamage()));
 			}
 			//double ray
 			else if (this->mainGunLevel == 1) 
@@ -554,13 +591,13 @@ void Player::Combat(const float& dt)
 					Vector2f(0.4f, .10f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f, this->getDamage()));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y+25),
 					Vector2f(0.4f, .10f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f, this->getDamage()));
 			}
 			else if (this->mainGunLevel == 2) 
 				{
@@ -569,22 +606,23 @@ void Player::Combat(const float& dt)
 					Vector2f(0.4f, .10f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f, this->getDamage()));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y  ),
 					Vector2f(0.4f, .10f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f, this->getDamage()));
 				this->bullets.add(Bullet(laserTexture,
 					Vector2f(this->playerCenter.x + 50.f, this->playerCenter.y +40),
 					Vector2f(0.4f, .10f),
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
-					5.f));
+					5.f, this->getDamage()));
 			}
 			//animation
 			this->mainGunSprite.move(-40.f, 0.f);
+			
 
 		}
 		else if (this->currentWeapons == MISSILE01)
@@ -595,7 +633,7 @@ void Player::Combat(const float& dt)
 					Vector2f(0.05f, 0.05f),
 					50.f, 2.f,
 					Vector2f(1.f, 0.f),
-					1.f));
+					1.f, this->getDamage()));
 
 			if (this->dualMissiles01)
 			{
@@ -605,7 +643,7 @@ void Player::Combat(const float& dt)
 					Vector2f(0.05f, 0.05f),
 					50.f, 2.f,
 					Vector2f(1.f, 0.f),
-					1.f));
+					1.f, this->getDamage()));
 			}
 		}
 		
@@ -648,6 +686,7 @@ void Player::Update(Vector2u windowBounds, const float& dt)
 	if (this->keyTime < this->keyTimeMax)
 		this->keyTime += 1.f * dt * this->dtMultipiler;
 
+	this->initSound();
 	this->Movement(windowBounds, dt);
 	this->changeAccessories(dt);
 	this->UpdateAccessories(dt);
