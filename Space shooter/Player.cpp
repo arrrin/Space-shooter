@@ -292,12 +292,13 @@ std::string Player::getStatsAsString() const
 
 void Player::initSound()
 {
-	this->laserSoundBuffer.loadFromFile("Sounds/Laser.wav");
+	this->laserSoundBuffer.loadFromFile("Sounds/laser9.wav");
 	if (!laserSoundBuffer.loadFromFile("Sounds/laser9.wav"))
 	{
-		std::cout<<"Error loading sound effect !"<<"\n";
+		std::cout << "Error loading sound effect !" << "\n";
 	}
 	this->laserSound.setBuffer(laserSoundBuffer);
+	this->laserSound.setVolume(100);
 	
 }
 
@@ -567,6 +568,7 @@ void Player::Movement(Vector2u windowBound, const float& dt)
 
 void Player::Combat(const float& dt)
 {
+	/*this->initSound();*/
 	if (Keyboard::isKeyPressed(Keyboard::Key(this->controls[controls::shoot]))
 		&& this->shootTimer >= this->shootTimerMax)
 	{
@@ -582,6 +584,7 @@ void Player::Combat(const float& dt)
 					60.f, 20.f,
 					Vector2f(1.f, 0.f),
 					5.f,this->getDamage()));
+				
 			}
 			//double ray
 			else if (this->mainGunLevel == 1) 

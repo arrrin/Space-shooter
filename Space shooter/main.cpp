@@ -7,11 +7,10 @@ int main()
 	Clock clock;
 	float dt = 0.f;
 	Music music;
-	//music.openFromFile("Musics/mainGameSong.wav");
-	//music.setVolume(5.f);
-	//music.play();
-	//music.setLoop(true);
 
+	/*music.openFromFile("Musics/mainGameSong.wav");
+	music.setVolume(1.f);
+	music.play();*/
 	Game game(&window);
 
 	while (window.isOpen())
@@ -25,7 +24,7 @@ int main()
 				window.close(); 
 		}
 		dt = clock.restart().asSeconds();
-			
+		
 			game.Update(dt);
 			game.Draw();
 	}

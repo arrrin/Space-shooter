@@ -14,20 +14,24 @@ private:
 	float multiplierTimer;
 	int multiplierAdder;
 	int multiplierAdderMax;
-	
+	bool fullscreen;
+	//audio
+
 	bool paused;
 	bool isMusicPlay;
 
 	//score function
-	FILE* fp;
-	char temp[255];
-	int Lscore[6];
-	std::string name[6];
-	std::vector<int> userScore;
-	bool canHighScoreGet;
-	bool fullscreen;
+	Text highScoreText;
+	int highScoreSet[5];
+	Text highScore1;
+	Text highScore2;
+	Text highScore3;
+	Text highScore4;
+	Text highScore5;
+
 	float keyTime;
 	float keyTimeMax;
+	int saveGameState = 1;
 
 	//upgrades keyTime
 	float keyTimeDoubleRay;
@@ -50,8 +54,10 @@ private:
 	Font font;
 	Font font1;
 	Font font2;
+	Font font3;
 
 	Text nameOfGame;
+	Text name;
 	Text followPlayerText;
 	Text staticPlayerText;
 	Text enemyText;
@@ -74,11 +80,16 @@ private:
 	RectangleShape doubleRayOutline;
 	RectangleShape tripleRayOutline;
 	RectangleShape piercingOutline;
-	RectangleShape playerExpBar; //bar
+	//bar
+	RectangleShape playerExpBar; 
+	RectangleShape playerHpbar;
+
 	RectangleShape playerStatsTextBack;
 
 	//sound
 	Music music;
+	Sound killEnemy;
+	SoundBuffer killEnemyBuffer;
 
 
 	//tags
@@ -145,6 +156,7 @@ public:
 	void initSound();
 	void initFont();
 	void initUI();
+	void initHighScoreText();
 	void initUpgradesUI();
 	void toggleFullscreen();
 	void UpdateUIPlayer(int index);

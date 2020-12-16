@@ -34,7 +34,6 @@ Game::Game(RenderWindow *window)
 	this->keyTime = this->keyTimeMax;
 	this->paused = true;
 	this->isMusicPlay = true;
-	this->canHighScoreGet = false;
 	
 	/*this->canGetHighScore = false;*/
 
@@ -117,6 +116,8 @@ void Game::initTextures()
 	temp.loadFromFile("Textures/enemyFollow.png");
 	this->enemyTextures.add(Texture(temp));
 	temp.loadFromFile("Textures/enemyMoveLeftShoot.png");
+	this->enemyTextures.add(Texture(temp));
+	temp.loadFromFile("Textures/alienspaceship.png");
 	this->enemyTextures.add(Texture(temp));
 
 	//enemy bullet
@@ -214,6 +215,10 @@ void Game::initSound()
 	//	isMusicPlay = false;
 	//	std::cout << "Play Music!!" << "\n";
 	//}
+
+	//this->killEnemyBuffer.loadFromFile("Sounds/crack.wav");
+	//this->killEnemy.setBuffer(killEnemyBuffer);
+	//this->killEnemy.setVolume(50);
 	
 }
 
@@ -222,6 +227,57 @@ void Game::initFont()
 	this->font.loadFromFile("Fonts/Dosis-Light.ttf");
 	this->font1.loadFromFile("Fonts/ethnocentric.ttf");
 	this->font2.loadFromFile("Fonts/airstrikeb3d.ttf");
+	this->font3.loadFromFile("Fonts/soloist1.ttf");
+}
+
+void Game::initHighScoreText()
+{
+
+	std::ifstream file_2("Save.txt");
+	std::string highscoreShow;
+	int iRun = 0;
+	int numstrTemp;
+	if (file_2.is_open())
+	{
+		while (file_2 >> highscoreShow)
+		{
+			numstrTemp = atoi(highscoreShow.c_str());
+			highScoreSet[iRun] = numstrTemp;
+			iRun++;
+		}
+		file_2.close();
+
+	}
+
+	this->highScore1.setFont(font);
+	this->highScore1.setCharacterSize(50);
+	this->highScore1.setFillColor(Color::White);
+	this->highScore1.setString("1. "+std::to_string(highScoreSet[0]));
+	this->highScore1.setPosition(1500.f, 250.f);
+
+	this->highScore2.setFont(font);
+	this->highScore2.setCharacterSize(50);
+	this->highScore2.setFillColor(Color::White);
+	this->highScore2.setString("2. "+std::to_string(highScoreSet[1]));
+	this->highScore2.setPosition(1500.f, 300.f);
+
+	this->highScore3.setFont(font);
+	this->highScore3.setCharacterSize(50);
+	this->highScore3.setFillColor(Color::White);
+	this->highScore3.setString("3. "+std::to_string(highScoreSet[2]));
+	this->highScore3.setPosition(1500.f, 350.f);
+
+	this->highScore4.setFont(font);
+	this->highScore4.setCharacterSize(50);
+	this->highScore4.setFillColor(Color::White);
+	this->highScore4.setString("4. "+std::to_string(highScoreSet[3]));
+	this->highScore4.setPosition(1500.f, 400.f);
+
+	this->highScore5.setFont(font);
+	this->highScore5.setCharacterSize(50);
+	this->highScore5.setFillColor(Color::White);
+	this->highScore5.setString("5. "+std::to_string(highScoreSet[4]));
+	this->highScore5.setPosition(1500.f, 450.f);
 }
 
 void Game::initUI()
@@ -235,6 +291,22 @@ void Game::initUI()
 	this->nameOfGame.setFillColor(Color::White);
 	this->nameOfGame.setString("AIR STRIKE");
 	this->nameOfGame.setPosition(1350.f, 5.f);
+
+	//high score
+	this->highScoreText.setFont(font3);
+	this->highScoreText.setCharacterSize(48);
+	this->highScoreText.setFillColor(Color::White);
+	this->highScoreText.setString("Leaderboard ");
+	this->highScoreText.setPosition(1500.f,180.f);
+
+	this->initHighScoreText();
+
+	//name text
+	this->name.setFont(font);
+	this->name.setCharacterSize(50);
+	this->name.setFillColor(Color::Black);
+	this->name.setString("\t63011063\nArin Srithawin");
+	this->name.setPosition(1600.f, 850.f);
 
 	//Follow text
 	this->followPlayerText.setFont(font);
@@ -250,6 +322,9 @@ void Game::initUI()
 	//Exp bar
 	this->playerExpBar.setSize(Vector2f(90.f, 10.f));
 	this->playerExpBar.setFillColor(Color(0.f, 90.f, 200.f, 200.f));
+
+	this->playerHpbar.setSize(Vector2f(90.f, 10.f));
+	this->playerHpbar.setFillColor(Color::Red);
 
 	this->enemyText.setFont(this->font);
 	this->enemyText.setCharacterSize(14);
@@ -390,11 +465,19 @@ void Game::UpdateUIPlayer(int index)
 	//bar
 	this->playerExpBar.setPosition(
 		this->players[index].getPosition().x + 15.f,
-		this->players[index].getPosition().y + 115.f);
+		this->players[index].getPosition().y + 130.f);
 	this->playerExpBar.setScale(
 		static_cast<float>(this->players[index].getExp())/this->players[index].getExpNext()
 		, 1.f
 	);
+	this->playerHpbar.setPosition(
+		this->players[index].getPosition().x +15.f,
+		this->players[index].getPosition().y + 115.f );
+	this->playerHpbar.setScale(
+		static_cast<float>(this->players[index].getHP()) / this->players[index].getHPMax()
+		,	1.f
+	);
+
 		//shield
 	this->shieldBar.setPosition(1700.f, 140.f);
 	this->shieldOutline.setPosition(1700.f, 140.f);
@@ -602,13 +685,14 @@ void Game::upgradesTimerUpdate(const float& dt)
 
 void Game::difficultyUpdate(const float& dt)
 {
+	
 	if ((int)this->difficultyTimer % 1000 == 0 && this->enemySpawnTimer > 10)
 	{
 		if (this->enemySpawnTimerMax > 10)
 		{
 			this->enemySpawnTimerMax--;
 		}
-
+		std::cout << "difficulty increase" << std::endl;
 		this->difficulty++;
 		this->difficultyTimer = 1.f;
 	}
@@ -663,7 +747,7 @@ void Game::enemiesSpawnUpdate(const float& dt)
 			this->window->getSize(),
 			Vector2f(0.f, 0.f),
 			Vector2f(-1.f, 0.f),
-			rand() % 3,
+			rand() % 4,
 			this->players[0].getLevel(),
 			rand() % this->playersAlive)
 		);
@@ -674,6 +758,7 @@ void Game::enemiesSpawnUpdate(const float& dt)
 
 void Game::playerUpdate(const float& dt)
 {
+	/*this->initSound();*/
 	for (size_t i = 0; i < this->players.size(); i++)
 	{
 		if (this->players[i].isAlive())
@@ -743,6 +828,7 @@ void Game::playerUpdate(const float& dt)
 						//enemy dead
 						if (this->enemies[j].getHP() <= 0)
 						{
+							/*killEnemy.play();*/
 							//Particle enemy dead
 							int nrOfPart = rand() % 8 + 5;
 							for (size_t l = 0; l < nrOfPart; l++)
@@ -1291,11 +1377,62 @@ void Game::pickupsUpdate(const float& dt)
 
 void Game::gameOver()
 {
+	if(saveGameState==1)
+	{
+	int num;
+	std::ifstream file_("save.txt");
+	std::string highscore;
+	int i = 0;
+	int numstr;
+	int textScore[5];
+	num = score;
+	if (file_.is_open())
+	{
+		while (file_ >> highscore)
+		{
+			numstr = atoi(highscore.c_str());
+			textScore[i] = numstr;
+			i++;
+		}
+		file_.close();
+
+	}
+	int posPoint;
+	int joint;
+	for (joint = 0; joint < 5; joint++)
+	{
+		if (num > textScore[joint])
+		{
+			posPoint = joint;
+			break;
+		}
+	}
+	int size = 5, index = joint;
+	int tempI = size - 1; // Not i=size (this is the size of the array not the last index)
+	while (tempI > index) {
+		textScore[tempI] = textScore[tempI - 1];
+		tempI--;
+	}
+	textScore[tempI] = num;
+	std::ofstream myfile;
+	myfile.open("save.txt");
+	for (int m = 0; m < 5; m++)
+	{
+		myfile << textScore[m];
+		if (m != 4)
+		{
+			myfile << "\n";
+		}
+	}
+	myfile.close();
+	saveGameState = 0;
+}
 
 	this->enemies.clear();
 	this->upgrades.clear();
 	this->pickups.clear();
 	this->textTags.clear();
+	Enemy::enemyBullets.clear();
 	this->gameOverText.setString
 	(
 		std::string("GAME OVER\nScore:" +
@@ -1318,9 +1455,10 @@ void Game::Restart()
 		this->score = 0;
 		this->scoreMultiplier = 1;
 		this->multiplierAdder = 0;
+		this->multiplierTimer = 0;
 		this->difficulty = 0;
 		this->bossEncounter = false;
-		this->enemySpawnTimerMax = 30.f;
+		this->enemySpawnTimerMax = 40.f;
 		this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
 		this->keyTimePiercingShot = this->keyTimePiercingShotMax;
 		this->keyTimeShield = this->keyTimeShieldMax;
@@ -1333,6 +1471,8 @@ void Game::Restart()
 		this->textTags.clear();
 		this->bosses.clear();
 		this->particles.clear();
+		Enemy::enemyBullets.clear();
+		
 	}
 }
 
@@ -1399,10 +1539,18 @@ void Game::DrawUI()
 	if (this->paused)
 	{
 		this->window->draw(this->nameOfGame);
+		this->window->draw(this->name);
+		this->window->draw(this->highScoreText);
+		this->window->draw(this->highScore1);
+		this->window->draw(this->highScore2);
+		this->window->draw(this->highScore3);
+		this->window->draw(this->highScore4);
+		this->window->draw(this->highScore5);
 	}
 
 	if (!this->paused)
 	{
+		
 		//draw text tag
 		for (size_t i = 0; i < this->textTags.size(); i++)
 		{
@@ -1456,7 +1604,8 @@ void Game::Draw()
 				this->window->draw(this->tripleRayBar);
 				this->window->draw(this->tripleRayOutline);
 				this->window->draw(this->tripleRayText);
-
+				
+				this->window->draw(this->playerHpbar);
 				this->window->draw(this->playerExpBar);
 				if (this->players[i].playerShowStatsIsPressed())
 				{

@@ -31,6 +31,7 @@ private:
 	int hpMax;
 	int damageMin;
 	int damageMax;
+	int nrOfBullet;
 
 	int playerFollow;
 

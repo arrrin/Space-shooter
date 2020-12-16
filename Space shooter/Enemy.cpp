@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-enum eTypes { MOVELEFT = 0, FOLLOW,MOVELEFTSHOOT,FOLLOWFAST, FOLLOWSHOOT };
+enum eTypes { MOVELEFT = 0, FOLLOW,MOVELEFTSHOOT,MOVELEFTSHOOT1, FOLLOWSHOOT };
 enum bulletType { BULLET=0, MISSILE};
 //
 dArr<Bullet> Enemy::enemyBullets;
@@ -35,6 +35,7 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 	this->windowBounds = windowBounds;
 	
+	this->nrOfBullet = 0;
 
 	this->damagetimerMax = 6.f;
 	this->damageTimer = 0;
@@ -87,11 +88,30 @@ Enemy::Enemy(dArr<Texture>& textures,
 
 		this->maxVelocity = rand() % 10  + 5;
 
-		this->shootTimerMax = 150.f;
+		this->nrOfBullet = 5;
+
+		this->shootTimerMax = 80.f;
 		this->shootTimer = 0.f;
 
 		break;
+	case MOVELEFTSHOOT1:
 
+		this->sprite.setScale(Vector2f(0.11f, 0.11f));
+		this->sprite.setRotation(270);
+
+		this->hpMax = (rand() % 3 + (1 * scalar)) * scalar;
+		this->hp = this->hpMax;
+
+		this->damageMax = (rand() % 2 + (1 * scalar)) * scalar;
+		this->damageMin = (rand() % 1 + (1 * scalar)) * scalar;
+
+		this->maxVelocity = rand() % 10 + 5;
+		this->nrOfBullet = 3;
+
+		this->shootTimerMax = 8.f;
+		this->shootTimer = 0.f;
+
+		break;
 
 	default:
 		this->hpMax = (rand() % 3 + 1) * scalar;
@@ -177,7 +197,7 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 		break;
 
 	case MOVELEFTSHOOT:
-		this->shootTimerMax = 150.f;
+		this->shootTimerMax = 80.f;
 		if (shootTimer < this->shootTimerMax)
 			this->shootTimer += 1.f * dt * this->dtMultipiler;
 
@@ -196,7 +216,7 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 		this->normalizedMoveDir = normalize(this->moveDirection, vectorLength(this->moveDirection));
 
 		//enemy shoot
-		if (this->shootTimer >= this->shootTimerMax)
+		if (this->shootTimer >= this->shootTimerMax && this->nrOfBullet>0)
 		{
 			this->enemyBullets.add(
 				Bullet(&(*this->bulletTextures)[BULLET],
@@ -207,8 +227,32 @@ void Enemy::Update(const float& dt,Vector2f playerPosition)
 					.5f, 
 					this->getDamage()));
 			this->shootTimer = 0.f;
+			this->nrOfBullet--;
 		}
 
+		break;
+	case MOVELEFTSHOOT1:
+		this->shootTimerMax = 8.f;
+		if (shootTimer < this->shootTimerMax)
+			this->shootTimer += 1.f * dt * this->dtMultipiler;
+
+		this->sprite.move(this->moveDirection.x * this->maxVelocity * dt * this->dtMultipiler,
+			this->moveDirection.y * this->maxVelocity * dt * this->dtMultipiler);
+
+		this->normalizedMoveDir = normalize(this->moveDirection, vectorLength(this->moveDirection));
+		if (this->shootTimer >= this->shootTimerMax && this->nrOfBullet > 0)
+		{
+			this->enemyBullets.add(
+				Bullet(&(*this->bulletTextures)[BULLET],
+					Vector2f(this->sprite.getPosition()),
+					Vector2f(0.2f, .2f),
+					5.f, 2.0f,
+					Vector2f(-1.f,0.f),
+					.5f,
+					this->getDamage()));
+			this->shootTimer = 0.f;
+			this->nrOfBullet--;
+		}
 		break;
 	default:
 		break;
