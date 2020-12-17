@@ -105,8 +105,6 @@ void Game::initTextures()
 	this->upgradeTextures.add(Texture(temp));
 	temp.loadFromFile("Textures/Upgrades/statpoint.png");
 	this->upgradeTextures.add(Texture(temp));
-	temp.loadFromFile("Textures/Upgrades/powerupRF.png");
-	this->upgradeTextures.add(Texture(temp));
 
 
 	//enemies
@@ -892,7 +890,7 @@ void Game::playerUpdate(const float& dt)
 									this->upgrades.add(Upgrade(
 										this->upgradeTextures,
 										this->enemies[j].getPosition(),
-										rand() % 6, 150.f)
+										rand() % 5, 150.f)
 									);
 								}
 							}
@@ -1294,21 +1292,6 @@ void Game::upgradesUpdate(const float& dt)
 					this->textTags.add(
 						TextTag(
 							&this->font, "Stat point INCREASE!",
-							Color(255, 165, 0),
-							Vector2f(this->players[k].getPosition().x + 20.f,
-								this->players[k].getPosition().y - 20.f),
-							Vector2f(0.f, -1.f),
-							40, 45.f
-							, true));
-					break;
-
-				case 6: // Laser maching gun
-					this->players[k].enableMachineGun();
-
-					this->keyTimeMachineGun - 1.f;
-					this->textTags.add(
-						TextTag(
-							&this->font, "Laser Machine Gun!",
 							Color(255, 165, 0),
 							Vector2f(this->players[k].getPosition().x + 20.f,
 								this->players[k].getPosition().y - 20.f),
