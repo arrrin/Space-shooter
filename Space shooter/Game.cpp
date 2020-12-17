@@ -5,7 +5,7 @@ enum textures { player = 0, laser01,missile01, mainGun01  };
 Game::Game(RenderWindow *window)
 {
 	this->window = window;
-	this->window->setFramerateLimit(120);
+	this->window->setFramerateLimit(60);
 	this->dtMultiplier = 60;
 	this->scoreMultiplier = 1;
 	this->score = 0;
@@ -1456,7 +1456,7 @@ void Game::Restart()
 		this->scoreMultiplier = 1;
 		this->multiplierAdder = 0;
 		this->multiplierTimer = 0;
-		this->difficulty = 0;
+		this->difficulty = 1;
 		this->bossEncounter = false;
 		this->enemySpawnTimerMax = 40.f;
 		this->keyTimeDoubleRay = this->keyTimeDoubleRayMax;
@@ -1550,7 +1550,7 @@ void Game::DrawUI()
 
 	if (!this->paused)
 	{
-		
+
 		//draw text tag
 		for (size_t i = 0; i < this->textTags.size(); i++)
 		{
@@ -1560,8 +1560,10 @@ void Game::DrawUI()
 	// over text!!
 	if (this->playersAlive <= 0)
 	{
-		this->window->draw(this->gameOverText);
+
+	this->window->draw(this->gameOverText);
 	}
+	
 	
 	//score
 	this->window->draw(this->scoreText);
