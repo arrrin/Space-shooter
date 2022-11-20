@@ -1,7 +1,7 @@
 #include "Game.h"
 
 enum textures { player = 0, laser01,missile01, mainGun01  };
-
+//Main
 Game::Game(RenderWindow *window)
 {
 	this->window = window;
